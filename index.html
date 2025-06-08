@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3301 - Level 1</title>
+    <style>
+        :root {
+            --glow-color: #0f0;
+            --bg-color: #000;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--glow-color);
+            font-family: 'Courier New', monospace;
+            margin: 0;
+            padding: 20px;
+            overflow: hidden;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            border: 1px solid var(--glow-color);
+            padding: 20px;
+            box-shadow: 0 0 10px var(--glow-color);
+            background: rgba(15, 30, 15, 0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--glow-color);
+            padding-bottom: 10px;
+        }
+        .blink {
+            animation: blink 1s step-end infinite;
+        }
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+        #password-input {
+            background: var(--bg-color);
+            border: 1px solid var(--glow-color);
+            color: var(--glow-color);
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+            width: 300px;
+            margin: 20px 0;
+            font-size: 16px;
+        }
+        #submit-btn {
+            background: var(--bg-color);
+            border: 1px solid var(--glow-color);
+            color: var(--glow-color);
+            padding: 10px 20px;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        #submit-btn:hover {
+            background: rgba(0, 80, 0, 0.3);
+            box-shadow: 0 0 15px var(--glow-color);
+        }
+        .message {
+            margin: 15px 0;
+            min-height: 1.5em;
+        }
+        .error {
+            color: #f00;
+            text-shadow: 0 0 5px #f00;
+        }
+        .success {
+            color: #0f0;
+            text-shadow: 0 0 5px #0f0;
+        }
+        .hidden {
+            display: none;
+        }
+        .terminal-text {
+            line-height: 1.6;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>// SYSTEM ACCESS POINT: LEVEL 1</h1>
+            <p>3301 ENCRYPTION PROTOCOL</p>
+        </div>
+        
+        <div class="terminal-text">
+            <p>> Initializing authentication sequence...</p>
+            <p>> Security protocols: ACTIVE</p>
+            <p>> Ciphertext detected: <span class="blink">KRZ DUH BRX?</span></p>
+            <p class="blink">> Enter decryption key:</p>
+        </div>
+        
+        <div id="access-form">
+            <input type="password" id="password-input" autocomplete="off" autofocus>
+            <br>
+            <button id="submit-btn">AUTHENTICATE</button>
+        </div>
+        
+        <div id="response" class="message"></div>
+        
+        <div id="success" class="hidden">
+            <div class="terminal-text success">
+                <p>> Authentication successful!</p>
+                <p>> Security clearance: LEVEL 2 GRANTED</p>
+                <p>> Redirecting to next gateway...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const passwordInput = document.getElementById('password-input');
+            const submitBtn = document.getElementById('submit-btn');
+            const responseDiv = document.getElementById('response');
+            const successDiv = document.getElementById('success');
+            const accessForm = document.getElementById('access-form');
+            
+            // Caesar cipher shift function
+            function caesarDecrypt(text, shift) {
+                return text.split('').map(char => {
+                    if (char.match(/[A-Z]/i)) {
+                        const code = char.charCodeAt(0);
+                        const base = code > 90 ? 97 : 65;
+                        return String.fromCharCode(((code - base + (26 - shift)) % 26) + base);
+                    }
+                    return char;
+                }).join('');
+            }
+            
+            // Handle password submission
+            function authenticate() {
+                const userInput = passwordInput.value.trim().toUpperCase();
+                
+                // Decrypt ciphertext with Caesar shift 3
+                const decrypted = caesarDecrypt("KRZ DUH BRX?", 3);
+                
+                if (userInput === decrypted || userInput === "WHOAREYOU") {
+                    responseDiv.innerHTML = '';
+                    accessForm.classList.add('hidden');
+                    successDiv.classList.remove('hidden');
+                    
+                    // Redirect to next level after delay
+                    setTimeout(() => {
+                        window.location.href = '.secrets/labyrinth/gateway.html';
+                    }, 3000);
+                } else {
+                    responseDiv.innerHTML = '<p class="error">> ACCESS DENIED: Invalid credentials</p>';
+                    passwordInput.value = '';
+                    passwordInput.focus();
+                }
+            }
+            
+            // Event listeners
+            submitBtn.addEventListener('click', authenticate);
+            passwordInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') authenticate();
+            });
+            
+            // Initial focus
+            passwordInput.focus();
+        });
+    </script>
+</body>
+</html>
