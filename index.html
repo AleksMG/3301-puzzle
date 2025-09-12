@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Исправленный омонофонный шифр</title>
+    <title>Омонофонный шифр с большими числами</title>
     <style>
         * {
             box-sizing: border-box;
@@ -24,7 +24,7 @@
         
         .container {
             width: 100%;
-            max-width: 900px;
+            max-width: 1000px;
             background: rgba(25, 25, 35, 0.95);
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
@@ -140,6 +140,7 @@
             border-radius: 8px;
             margin: 20px 0;
             border: 1px solid #444;
+            font-size: 14px;
         }
         
         .status {
@@ -147,22 +148,28 @@
             padding: 10px;
             border-radius: 5px;
             background: #2a2a3a;
+            font-size: 14px;
+        }
+        
+        .big-number {
+            word-break: break-all;
+            font-size: 12px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Исправленный омонофонный шифр</h1>
+        <h1>Омонофонный шифр с большими числами</h1>
         
         <div class="key-controls">
-            <input type="number" id="primeP" placeholder="Простое число p" value="61">
-            <input type="number" id="primeQ" placeholder="Простое число q" value="53">
-            <button id="generateKeys">Сгенерировать новые ключи</button>
+            <input type="text" id="primeP" placeholder="Простое число p" value="1125899839733759">
+            <input type="text" id="primeQ" placeholder="Простое число q" value="18014398241046527">
+            <button id="generateKeys">Использовать предустановленные ключи</button>
         </div>
         
         <div class="status" id="keyStatus">Статус ключей: Не инициализированы</div>
         
-        <textarea id="inputText" placeholder="Введите текст для шифрования">Hello World 123!</textarea>
+        <textarea id="inputText" placeholder="Введите текст для шифрования">Hello World! Test 123</textarea>
         
         <div class="buttons">
             <button id="encryptBtn">Зашифровать</button>
@@ -177,15 +184,25 @@
         
         <div class="math-info">
             <h3>Математическая основа:</h3>
-            <p>• K = 65536 (масштабирующий множитель)</p>
-            <p>• X = M + i × K, где i ∈ [1, floor((N-256)/K)]</p>
+            <p>• K = 65536 (масштабирующий множитель 2¹⁶)</p>
+            <p>• Большие простые числа: p и q (50-60 бит)</p>
+            <p>• N = p × q (100+ бит)</p>
+            <p>• X = M + i × K, где i ∈ [1, floor((N-255)/K)]</p>
             <p>• Шифрование: C = X<sup>e</sup> mod N</p>
-            <p>• Дешифрование: M = (C<sup>d</sup> mod N) mod K</p>
-            <p>• Гарантированная непересекаемость омофонов</p>
+            <p>• Дешифрование: X = C<sup>d</sup> mod N, M = X mod K</p>
         </div>
     </div>
 
     <script>
+        // Большие простые числа (50-60 бит)
+        const BIG_PRIMES = [
+            '1125899839733759',    // ~50 бит
+            '18014398241046527',   // ~54 бит  
+            '288230375614840831',  // ~58 бит
+            '1152921504606847003', // ~60 бит
+            '4611686018427387877'  // ~62 бита
+        ];
+
         document.addEventListener('DOMContentLoaded', function() {
             const primePInput = document.getElementById('primeP');
             const primeQInput = document.getElementById('primeQ');
@@ -199,29 +216,35 @@
             
             let n, e, d, phi, max_i;
             const K = 65536; // Масштабирующий множитель (2^16)
+            const E = 65537; // Открытая экспонента
             
-            // Функция для вычисления НОД
+            // Функция для вычисления НОД (Большие числа)
             function gcd(a, b) {
-                return b === 0 ? a : gcd(b, a % b);
+                a = BigInt(a);
+                b = BigInt(b);
+                while (b !== 0n) {
+                    [a, b] = [b, a % b];
+                }
+                return Number(a);
             }
             
-            // Функция для вычисления модульного обратного
+            // Расширенный алгоритм Евклида для больших чисел
             function modInverse(a, m) {
-                let [old_r, r] = [a, m];
-                let [old_s, s] = [1, 0];
-                let [old_t, t] = [0, 1];
+                let [old_r, r] = [BigInt(a), BigInt(m)];
+                let [old_s, s] = [1n, 0n];
+                let [old_t, t] = [0n, 1n];
                 
-                while (r !== 0) {
-                    const quotient = Math.floor(old_r / r);
+                while (r !== 0n) {
+                    const quotient = old_r / r;
                     [old_r, r] = [r, old_r - quotient * r];
                     [old_s, s] = [s, old_s - quotient * s];
                     [old_t, t] = [t, old_t - quotient * t];
                 }
                 
-                return old_s < 0 ? old_s + m : old_s;
+                return old_s < 0n ? old_s + BigInt(m) : old_s;
             }
             
-            // Функция для быстрого возведения в степень по модулю
+            // Быстрое возведение в степень по модулю для больших чисел
             function modExp(base, exponent, modulus) {
                 if (modulus === 1n) return 0n;
                 let result = 1n;
@@ -236,44 +259,44 @@
                     exp = exp >> 1n;
                 }
                 
-                return Number(result);
+                return result;
             }
             
             // Инициализация ключей
             function initKeys() {
-                const p = parseInt(primePInput.value);
-                const q = parseInt(primeQInput.value);
+                const p = primePInput.value;
+                const q = primeQInput.value;
                 
-                if (isNaN(p) || isNaN(q) || p === q) {
+                if (!p || !q || p === q) {
                     outputResult.textContent = 'Ошибка: p и q должны быть разными простыми числами';
-                    keyStatus.textContent = 'Статус ключей: Ошибка';
-                    keyStatus.style.background = '#ff4757';
                     return false;
                 }
                 
-                n = p * q;
-                phi = (p - 1) * (q - 1);
+                // Используем BigInt для больших чисел
+                n = BigInt(p) * BigInt(q);
+                phi = (BigInt(p) - 1n) * (BigInt(q) - 1n);
                 
-                // Выбор открытой экспоненты
-                e = 65537;
-                while (gcd(e, phi) !== 1) {
-                    e++;
+                // Проверяем, что e и phi взаимно просты
+                if (gcd(E, Number(phi)) !== 1) {
+                    outputResult.textContent = 'Ошибка: e и φ(n) не взаимно просты';
+                    return false;
                 }
                 
                 // Вычисление закрытой экспоненты
-                d = modInverse(e, phi);
+                d = modInverse(E, phi);
                 
                 // Вычисление максимального i
-                max_i = Math.floor((n - 255) / K);
-                if (max_i < 1) {
-                    outputResult.textContent = 'Ошибка: модуль n слишком мал для выбранного K';
-                    keyStatus.textContent = 'Статус ключей: Ошибка';
-                    keyStatus.style.background = '#ff4757';
+                const n_num = Number(n);
+                max_i = Math.floor((n_num - 255) / K);
+                
+                if (max_i < 1000) {
+                    outputResult.textContent = 'Ошибка: модуль n слишком мал. Нужны бóльшие простые числа.';
                     return false;
                 }
                 
-                keyStatus.textContent = `Статус ключей: OK (n=${n}, max_i=${max_i})`;
-                keyStatus.style.background = '#2a2a3a';
+                keyStatus.innerHTML = `Статус ключей: OK<br>
+                    n: <span class="big-number">${n.toString()}</span><br>
+                    max_i: ${max_i.toLocaleString()}`;
                 return true;
             }
             
@@ -285,19 +308,20 @@
                 
                 for (let idx = 0; idx < text.length; idx++) {
                     const M = text.charCodeAt(idx);
-                    // Случайный выбор омофона для этого символа
-                    const i = Math.floor(Math.random() * max_i) + 1;
+                    // Случайный выбор омофона
+                    const i = Math.floor(Math.random() * (max_i - 1000)) + 500;
                     
-                    // X = M + i * K (гарантирует непересекаемость)
+                    // X = M + i * K
                     const X = M + i * K;
+                    const X_big = BigInt(X);
                     
-                    if (X >= n) {
-                        outputResult.textContent = `Ошибка: X=${X} >= n=${n}`;
+                    if (X_big >= n) {
+                        outputResult.textContent = `Ошибка: X >= n`;
                         return null;
                     }
                     
                     // Шифрование: C = X^e mod n
-                    const C = modExp(X, e, n);
+                    const C = modExp(X, E, n);
                     
                     result.push(C.toString());
                 }
@@ -313,21 +337,22 @@
                 const result = [];
                 
                 for (const cipherNum of cipherArray) {
-                    const C = parseInt(cipherNum);
+                    const C = BigInt(cipherNum);
                     
-                    if (isNaN(C)) {
-                        outputResult.textContent = 'Ошибка: неверный формат шифротекста';
+                    if (C >= n) {
+                        outputResult.textContent = `Ошибка: C >= n`;
                         return null;
                     }
                     
                     // Дешифрование: X = C^d mod n
                     const X = modExp(C, d, n);
+                    const X_num = Number(X);
                     
-                    // Восстановление исходного символа: M = X mod K
-                    const M = X % K;
+                    // M = X mod K
+                    const M = X_num % K;
                     
                     if (M < 0 || M > 255) {
-                        outputResult.textContent = `Ошибка: некорректное значение M=${M}`;
+                        outputResult.textContent = `Ошибка дешифрования: M=${M}`;
                         return null;
                     }
                     
@@ -339,19 +364,11 @@
             
             // Обработчики событий
             generateKeysBtn.addEventListener('click', function() {
-                // Большие простые числа для обеспечения достаточного диапазона
-                const primes = [211, 223, 227, 229, 233, 239, 241, 251, 257, 263];
-                primePInput.value = primes[Math.floor(Math.random() * primes.length)];
-                
-                let q;
-                do {
-                    q = primes[Math.floor(Math.random() * primes.length)];
-                } while (q === parseInt(primePInput.value));
-                
-                primeQInput.value = q;
+                primePInput.value = BIG_PRIMES[0];
+                primeQInput.value = BIG_PRIMES[1];
                 
                 if (initKeys()) {
-                    outputResult.textContent = 'Новые ключи сгенерированы!';
+                    outputResult.textContent = 'Большие ключи установлены!';
                 }
             });
             
@@ -377,7 +394,7 @@
                 
                 const decrypted = decrypt(text);
                 if (decrypted) {
-                    outputResult.textContent = decrypted;
+                    outputResult.textContent = 'Расшифрованный текст: ' + decrypted;
                 }
             });
             
