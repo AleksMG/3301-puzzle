@@ -383,9 +383,9 @@
                         }
                     }
 
-                    // Create and shuffle numbers 0-4095
+                    // Create deterministic permutation based on key
                     const numbers = Array.from({length: 4096}, (_, i) => i);
-                    await this.cryptographicShuffle(numbers, this.keyMaterial);
+                    this.deterministicShuffle(numbers, this.keyMaterial);
 
                     // Fill cube with shuffled numbers
                     let index = 0;
@@ -438,86 +438,115 @@
                 return new Uint8Array(derivedBits);
             }
 
-            async cryptographicShuffle(array, keyMaterial) {
-                // Use CSPRNG for shuffling
+            deterministicShuffle(array, keyMaterial) {
+                // Детерминированное перемешивание на основе ключа
+                const keyArray = Array.from(keyMaterial);
                 for (let i = array.length - 1; i > 0; i--) {
-                    const randomIndex = await this.getSecureRandomIndex(i, keyMaterial);
-                    [array[i], array[randomIndex]] = [array[randomIndex], array[i]];
+                    // Генерируем детерминированный индекс на основе ключа
+                    const keyIndex = i % keyArray.length;
+                    const randomValue = keyArray[keyIndex] * (i + 1) + keyArray[(i + keyIndex) % keyArray.length];
+                    const j = randomValue % (i + 1);
+                    
+                    // Меняем местами
+                    [array[i], array[j]] = [array[j], array[i]];
                 }
-            }
-
-            async getSecureRandomIndex(max, keyMaterial) {
-                const randomValue = new Uint32Array(1);
-                crypto.getRandomValues(randomValue);
-                return randomValue[0] % (max + 1);
             }
 
             encrypt(data) {
                 if (!this.initialized) throw new Error("Cipher not initialized");
 
                 const bytes = this.stringToBytes(data);
-                const coords = {k: [], x: [], y: []};
+                const encryptedBytes = [];
                 
-                // Get coordinates for each byte
-                for (const byte of bytes) {
-                    const [k, x, y] = this.positionMap.get(byte);
-                    coords.k.push(k);
-                    coords.x.push(x);
-                    coords.y.push(y);
+                // Обрабатываем данные блоками по 3 символа (как в оригинальном Trifid)
+                for (let i = 0; i < bytes.length; i += 3) {
+                    const block = bytes.slice(i, i + 3);
+                    const encryptedBlock = this.processTrifidBlock(block, true);
+                    encryptedBytes.push(...encryptedBlock);
                 }
 
-                // Ключевой этап Trifid: перемешивание координат
-                const allCoords = [];
-                for (let i = 0; i < bytes.length; i++) {
-                    allCoords.push(coords.k[i], coords.x[i], coords.y[i]);
-                }
-
-                // Разбиваем на группы по 3 координаты и преобразуем обратно в байты
-                const result = [];
-                for (let i = 0; i < allCoords.length; i += 3) {
-                    if (i + 2 < allCoords.length) {
-                        const k = allCoords[i];
-                        const x = allCoords[i + 1];
-                        const y = allCoords[i + 2];
-                        result.push(this.cube[k][x][y]);
-                    }
-                }
-
-                return this.bytesToHex(new Uint8Array(result));
+                return this.bytesToHex(new Uint8Array(encryptedBytes));
             }
 
             decrypt(hexData) {
                 if (!this.initialized) throw new Error("Cipher not initialized");
 
                 const bytes = this.hexToBytes(hexData);
-                const coords = {k: [], x: [], y: []};
-
-                // Get coordinates for each encrypted byte
-                for (const byte of bytes) {
-                    const [k, x, y] = this.positionMap.get(byte);
-                    coords.k.push(k);
-                    coords.x.push(x);
-                    coords.y.push(y);
-                }
-
-                // Обратное преобразование: снова перемешиваем координаты
-                const allCoords = [];
-                for (let i = 0; i < bytes.length; i++) {
-                    allCoords.push(coords.k[i], coords.x[i], coords.y[i]);
-                }
-
-                // Восстанавливаем исходные координаты
-                const result = [];
-                const totalElements = allCoords.length / 3;
+                const decryptedBytes = [];
                 
-                for (let i = 0; i < totalElements; i++) {
-                    const k = allCoords[i];
-                    const x = allCoords[i + totalElements];
-                    const y = allCoords[i + 2 * totalElements];
-                    result.push(this.cube[k][x][y]);
+                // Обрабатываем данные блоками по 3 символа
+                for (let i = 0; i < bytes.length; i += 3) {
+                    const block = bytes.slice(i, i + 3);
+                    const decryptedBlock = this.processTrifidBlock(block, false);
+                    decryptedBytes.push(...decryptedBlock);
                 }
 
-                return this.bytesToString(new Uint8Array(result));
+                return this.bytesToString(new Uint8Array(decryptedBytes));
+            }
+
+            processTrifidBlock(block, encrypt) {
+                const coords = [];
+                
+                // Получаем координаты для каждого символа в блоке
+                for (const byte of block) {
+                    coords.push(...this.positionMap.get(byte));
+                }
+                
+                if (encrypt) {
+                    // При шифровании: перемешиваем координаты
+                    const mixedCoords = this.mixCoordinates(coords);
+                    return this.coordsToBytes(mixedCoords);
+                } else {
+                    // При дешифровании: восстанавливаем исходный порядок координат
+                    const unmixedCoords = this.unmixCoordinates(coords);
+                    return this.coordsToBytes(unmixedCoords);
+                }
+            }
+
+            mixCoordinates(coords) {
+                // Классическое перемешивание Trifid: [k1,x1,y1, k2,x2,y2, k3,x3,y3] -> [k1,k2,k3, x1,x2,x3, y1,y2,y3]
+                const result = [];
+                const groupSize = coords.length / 3;
+                
+                for (let i = 0; i < groupSize; i++) {
+                    result.push(coords[i]); // k1, k2, k3
+                }
+                for (let i = 0; i < groupSize; i++) {
+                    result.push(coords[i + groupSize]); // x1, x2, x3
+                }
+                for (let i = 0; i < groupSize; i++) {
+                    result.push(coords[i + 2 * groupSize]); // y1, y2, y3
+                }
+                
+                return result;
+            }
+
+            unmixCoordinates(coords) {
+                // Обратное перемешивание: [k1,k2,k3, x1,x2,x3, y1,y2,y3] -> [k1,x1,y1, k2,x2,y2, k3,x3,y3]
+                const result = [];
+                const groupSize = coords.length / 3;
+                
+                for (let i = 0; i < groupSize; i++) {
+                    result.push(coords[i]); // k1
+                    result.push(coords[i + groupSize]); // x1
+                    result.push(coords[i + 2 * groupSize]); // y1
+                }
+                
+                return result;
+            }
+
+            coordsToBytes(coords) {
+                const bytes = [];
+                // Преобразуем координаты обратно в байты
+                for (let i = 0; i < coords.length; i += 3) {
+                    if (i + 2 < coords.length) {
+                        const k = coords[i];
+                        const x = coords[i + 1];
+                        const y = coords[i + 2];
+                        bytes.push(this.cube[k][x][y]);
+                    }
+                }
+                return bytes;
             }
 
             stringToBytes(str) {
