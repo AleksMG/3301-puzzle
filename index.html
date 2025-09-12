@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PROFESSIONAL BYTE TRIFID 16x16x16</title>
+    <title>PROFESSIONAL BYTE TRIFID 16x16x16 - ЧИСЛОВАЯ ВЕРСИЯ</title>
     <style>
+        /* Стили остаются такими же */
         :root {
             --primary: #0f0c29;
             --secondary: #302b63;
@@ -256,13 +257,30 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        
+        .debug-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .binary-view {
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>PROFESSIONAL BYTE TRIFID CIPHER</h1>
-            <div class="subtitle">16×16×16 MILITARY-GRADE CRYPTOGRAPHIC SYSTEM</div>
+            <h1>PROFESSIONAL BYTE TRIFID CIPHER - ЧИСЛОВАЯ ВЕРСИЯ</h1>
+            <div class="subtitle">16×16×16 - РАБОТА С ЧИСЛАМИ ВМЕСТО HEX</div>
         </header>
 
         <div class="crypto-section">
@@ -291,8 +309,8 @@
             <div class="panel">
                 <h2>CRYPTO OPERATIONS</h2>
                 <div class="input-group">
-                    <label for="inputData">INPUT DATA (HEX/TEXT):</label>
-                    <textarea id="inputData" placeholder="Enter data for processing..."></textarea>
+                    <label for="inputData">INPUT DATA (TEXT):</label>
+                    <textarea id="inputData" placeholder="Enter data for processing...">Test message</textarea>
                 </div>
                 
                 <div class="input-group">
@@ -310,8 +328,8 @@
                 </div>
                 
                 <div class="result-area">
-                    <strong>OUTPUT:</strong>
-                    <div id="outputResult" class="hex-view"></div>
+                    <strong>OUTPUT (NUMERIC ARRAY):</strong>
+                    <div id="outputResult" class="binary-view"></div>
                 </div>
             </div>
         </div>
@@ -325,28 +343,19 @@
         </div>
 
         <div class="panel">
-            <h2>SYSTEM SPECIFICATIONS</h2>
-            <div class="specs">
-                <div class="spec-item">
-                    <h3>ARCHITECTURE</h3>
-                    <p>16 independent cubes × 16 rows × 16 columns</p>
-                    <p>4096 unique coordinate positions</p>
-                    <p>3D coordinate transformation system</p>
-                </div>
-                
-                <div class="spec-item">
-                    <h3>CRYPTOGRAPHIC PROPERTIES</h3>
-                    <p>Key space: 4096! permutations</p>
-                    <p>256-bit secure key derivation</p>
-                    <p>Military-grade transformation</p>
-                </div>
-                
-                <div class="spec-item">
-                    <h3>PERFORMANCE</h3>
-                    <p>Real-time byte processing</p>
-                    <p>Low memory footprint</p>
-                    <p>High-speed coordinate mapping</p>
-                </div>
+            <h2>DEBUG INFORMATION</h2>
+            <div class="debug-info" id="debugInfo"></div>
+        </div>
+
+        <div class="panel">
+            <h2>DATA CONVERSION</h2>
+            <div class="btn-group">
+                <button onclick="convertToBinary()">CONVERT TO BINARY</button>
+                <button onclick="convertToText()">CONVERT TO TEXT</button>
+            </div>
+            <div class="result-area">
+                <strong>CONVERSION RESULT:</strong>
+                <div id="conversionResult" class="binary-view"></div>
             </div>
         </div>
     </div>
@@ -356,7 +365,6 @@
             constructor() {
                 this.cube = null;
                 this.positionMap = new Map(); // value -> [k, x, y]
-                this.reverseMap = new Map();  // [k, x, y] -> value
                 this.initialized = false;
             }
 
@@ -387,7 +395,6 @@
                                 const value = shuffledValues[index++];
                                 this.cube[k][i][j] = value;
                                 this.positionMap.set(value, [k, i, j]);
-                                this.reverseMap.set(`${k},${i},${j}`, value);
                             }
                         }
                     }
@@ -430,17 +437,27 @@
                 const bytes = this.stringToBytes(data);
                 const encryptedValues = [];
                 
+                let debugInfo = "ENCRYPTION PROCESS:\n";
+                debugInfo += `Input bytes: [${bytes.join(', ')}]\n`;
+                
                 // Обрабатываем данные блоками по 3 байта
                 for (let i = 0; i < bytes.length; i += 3) {
                     const block = bytes.slice(i, i + 3);
+                    debugInfo += `\nBlock ${i/3}: [${block.join(', ')}]\n`;
                     
                     // Получаем координаты для каждого байта (0-255)
                     const coords = [];
                     for (const byte of block) {
-                        // Байт 0-255 -> значение 0-4095 в кубе
-                        const value = byte; // Исходный байт
-                        coords.push(...this.positionMap.get(value));
+                        // Находим координаты, где находится это значение в кубе
+                        const coord = this.positionMap.get(byte);
+                        if (!coord) {
+                            throw new Error(`Value ${byte} not found in cube`);
+                        }
+                        coords.push(...coord);
+                        debugInfo += `  Byte ${byte} -> coordinates: [${coord.join(', ')}]\n`;
                     }
+                    
+                    debugInfo += `  All coordinates: [${coords.join(', ')}]\n`;
                     
                     // Перемешиваем координаты в стиле Trifid
                     const mixedCoords = [];
@@ -456,37 +473,52 @@
                         mixedCoords.push(coords[j + 2 * groupSize]); // Все y координаты
                     }
                     
+                    debugInfo += `  Mixed coordinates: [${mixedCoords.join(', ')}]\n`;
+                    
                     // Преобразуем координаты обратно в значения 0-4095
                     for (let j = 0; j < mixedCoords.length; j += 3) {
                         if (j + 2 < mixedCoords.length) {
                             const k = mixedCoords[j];
                             const x = mixedCoords[j + 1];
                             const y = mixedCoords[j + 2];
-                            encryptedValues.push(this.cube[k][x][y]);
+                            const value = this.cube[k][x][y];
+                            encryptedValues.push(value);
+                            debugInfo += `  Coordinates [${k}, ${x}, ${y}] -> value: ${value}\n`;
                         }
                     }
                 }
 
-                // Конвертируем значения 0-4095 в байты (могут быть multi-byte)
-                return this.valuesToHex(encryptedValues);
+                debugInfo += `\nFinal values: [${encryptedValues.join(', ')}]`;
+                document.getElementById('debugInfo').textContent = debugInfo;
+                
+                return encryptedValues;
             }
 
-            decrypt(hexData) {
+            decrypt(encryptedValues) {
                 if (!this.initialized) throw new Error("Cipher not initialized");
 
-                // Конвертируем hex обратно в значения 0-4095
-                const encryptedValues = this.hexToValues(hexData);
                 const decryptedBytes = [];
+                
+                let debugInfo = "DECRYPTION PROCESS:\n";
+                debugInfo += `Input values: [${encryptedValues.join(', ')}]\n`;
                 
                 // Обрабатываем данные блоками по 3 зашифрованных значения
                 for (let i = 0; i < encryptedValues.length; i += 3) {
                     const block = encryptedValues.slice(i, i + 3);
+                    debugInfo += `\nBlock ${i/3}: [${block.join(', ')}]\n`;
                     
                     // Получаем координаты для каждого зашифрованного значения
                     const coords = [];
                     for (const value of block) {
-                        coords.push(...this.positionMap.get(value));
+                        const coord = this.positionMap.get(value);
+                        if (!coord) {
+                            throw new Error(`Value ${value} not found in cube`);
+                        }
+                        coords.push(...coord);
+                        debugInfo += `  Value ${value} -> coordinates: [${coord.join(', ')}]\n`;
                     }
+                    
+                    debugInfo += `  All coordinates: [${coords.join(', ')}]\n`;
                     
                     // Восстанавливаем исходный порядок координат
                     const originalCoords = [];
@@ -498,6 +530,8 @@
                         originalCoords.push(coords[j + 2 * groupSize]); // y1
                     }
                     
+                    debugInfo += `  Restored coordinates: [${originalCoords.join(', ')}]\n`;
+                    
                     // Преобразуем координаты обратно в байты 0-255
                     for (let j = 0; j < originalCoords.length; j += 3) {
                         if (j + 2 < originalCoords.length) {
@@ -505,53 +539,16 @@
                             const x = originalCoords[j + 1];
                             const y = originalCoords[j + 2];
                             const value = this.cube[k][x][y];
-                            // Значение 0-4095 -> байт 0-255
-                            decryptedBytes.push(value & 0xFF);
+                            decryptedBytes.push(value);
+                            debugInfo += `  Coordinates [${k}, ${x}, ${y}] -> value: ${value}\n`;
                         }
                     }
                 }
 
+                debugInfo += `\nDecrypted bytes: [${decryptedBytes.join(', ')}]`;
+                document.getElementById('debugInfo').textContent = debugInfo;
+                
                 return this.bytesToString(new Uint8Array(decryptedBytes));
-            }
-
-            valuesToHex(values) {
-                // Конвертируем значения 0-4095 в hex строку
-                let hex = '';
-                for (const value of values) {
-                    if (value < 256) {
-                        // Однобайтовое значение
-                        hex += value.toString(16).padStart(2, '0');
-                    } else {
-                        // Двухбайтовое значение
-                        hex += value.toString(16).padStart(4, '0');
-                    }
-                }
-                return hex;
-            }
-
-            hexToValues(hex) {
-                // Конвертируем hex строку обратно в значения 0-4095
-                const values = [];
-                let i = 0;
-                
-                while (i < hex.length) {
-                    // Пытаемся прочитать двухбайтовое значение (4 hex цифры)
-                    if (i + 3 < hex.length) {
-                        const twoByteValue = parseInt(hex.substr(i, 4), 16);
-                        if (twoByteValue < 4096) {
-                            values.push(twoByteValue);
-                            i += 4;
-                            continue;
-                        }
-                    }
-                    
-                    // Если не получилось, читаем однобайтовое значение
-                    const oneByteValue = parseInt(hex.substr(i, 2), 16);
-                    values.push(oneByteValue);
-                    i += 2;
-                }
-                
-                return values;
             }
 
             stringToBytes(str) {
@@ -634,23 +631,51 @@
                 let result;
                 if (mode === 'encrypt') {
                     result = trifidCipher.encrypt(input);
+                    document.getElementById('outputResult').textContent = `[${result.join(', ')}]`;
                 } else {
-                    result = trifidCipher.decrypt(input);
+                    // Для дешифрования ожидаем массив чисел
+                    const numbers = parseNumberArray(input);
+                    result = trifidCipher.decrypt(numbers);
+                    document.getElementById('outputResult').textContent = result;
                 }
                 
-                document.getElementById('outputResult').textContent = result;
             } catch (error) {
                 alert('Error: ' + error.message);
+                document.getElementById('debugInfo').textContent = 'Error: ' + error.message;
             }
+        }
+
+        function parseNumberArray(input) {
+            // Парсим строку вида "[1, 2, 3]" или "1, 2, 3"
+            const cleanInput = input.replace(/[\[\]\s]/g, '');
+            if (!cleanInput) return [];
+            return cleanInput.split(',').map(Number).filter(n => !isNaN(n));
         }
 
         function clearResults() {
             document.getElementById('outputResult').textContent = '';
             document.getElementById('inputData').value = '';
+            document.getElementById('debugInfo').textContent = '';
+            document.getElementById('conversionResult').textContent = '';
         }
 
         function performBenchmark() {
             alert('Benchmark functionality not implemented in this version');
+        }
+
+        function convertToBinary() {
+            const input = document.getElementById('outputResult').textContent;
+            const numbers = parseNumberArray(input);
+            const binary = numbers.map(n => n.toString(2).padStart(12, '0')).join(' ');
+            document.getElementById('conversionResult').textContent = binary;
+        }
+
+        function convertToText() {
+            const input = document.getElementById('outputResult').textContent;
+            const numbers = parseNumberArray(input);
+            const bytes = new Uint8Array(numbers);
+            const text = new TextDecoder().decode(bytes);
+            document.getElementById('conversionResult').textContent = text;
         }
 
         // Initialize with default key
