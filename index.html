@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PROFESSIONAL BYTE TRIFID 16x16x16</title>
     <style>
+        /* Стили остаются без изменений */
         :root {
             --primary: #0f0c29;
             --secondary: #302b63;
@@ -465,10 +466,11 @@
                     coords.y.push(y);
                 }
 
-                // Trifid transformation
+                // Trifid transformation - группируем координаты
                 const allCoords = [...coords.k, ...coords.x, ...coords.y];
                 const result = [];
 
+                // Преобразуем координаты обратно в байты
                 for (let i = 0; i < allCoords.length; i += 3) {
                     if (i + 2 < allCoords.length) {
                         const k = allCoords[i];
@@ -500,6 +502,7 @@
                 const allCoords = [...coords.k, ...coords.x, ...coords.y];
                 const result = [];
 
+                // Восстанавливаем исходные координаты
                 for (let i = 0; i < totalCoords; i++) {
                     const k = allCoords[i];
                     const x = allCoords[i + totalCoords];
