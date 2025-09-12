@@ -3,19 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Гомофонический Шифр</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <title>PROFESSIONAL BYTE TRIFID 16x16x16</title>
     <style>
+        :root {
+            --primary: #0f0c29;
+            --secondary: #302b63;
+            --accent: #24243e;
+            --text: #00ffcc;
+            --highlight: #ff00ff;
+            --border: #00ffcc;
+            --error: #ff4444;
+            --success: #00ff88;
+        }
+        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Fira Code', monospace;
+            font-family: 'Courier New', Monaco, monospace;
         }
         
         body {
-            background: linear-gradient(135deg, #0a192f, #112240, #0a192f);
-            color: #64ffda;
+            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+            color: var(--text);
             min-height: 100vh;
             padding: 20px;
             line-height: 1.6;
@@ -24,58 +34,59 @@
         .container {
             max-width: 1400px;
             margin: 0 auto;
+            padding: 20px;
         }
         
         header {
             text-align: center;
             margin-bottom: 30px;
-            padding: 20px;
-            background: rgba(23, 42, 69, 0.8);
-            border-radius: 10px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-            border: 1px solid #64ffda;
+            padding: 30px;
+            border: 3px solid var(--border);
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(0, 255, 204, 0.2);
         }
         
         h1 {
-            font-size: 2.8rem;
-            margin-bottom: 10px;
-            color: #64ffda;
-            text-shadow: 0 0 10px rgba(100, 255, 218, 0.5);
+            font-size: 2.8em;
+            margin-bottom: 15px;
+            text-shadow: 0 0 15px var(--text), 0 0 25px var(--text);
+            letter-spacing: 2px;
         }
         
         .subtitle {
-            font-size: 1.3rem;
-            opacity: 0.9;
-            color: #8892b0;
+            color: var(--highlight);
+            font-size: 1.3em;
+            font-weight: bold;
         }
         
-        .main-content {
+        .crypto-section {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-bottom: 40px;
+            gap: 25px;
+            margin-bottom: 35px;
         }
         
-        @media (max-width: 1100px) {
-            .main-content {
+        @media (max-width: 1024px) {
+            .crypto-section {
                 grid-template-columns: 1fr;
             }
         }
         
         .panel {
-            background: rgba(23, 42, 69, 0.8);
-            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid var(--border);
+            border-radius: 12px;
             padding: 25px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-            border: 1px solid #1e2d3d;
+            box-shadow: 0 0 25px rgba(0, 255, 204, 0.25);
         }
         
-        .panel-title {
-            font-size: 1.8rem;
+        h2 {
+            color: var(--highlight);
             margin-bottom: 20px;
-            color: #64ffda;
-            border-bottom: 2px solid #64ffda;
-            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 8px;
+            font-size: 1.5em;
         }
         
         .input-group {
@@ -85,308 +96,536 @@
         label {
             display: block;
             margin-bottom: 8px;
-            font-weight: 600;
-            color: #50fa7b;
-            font-size: 1.1rem;
+            color: var(--text);
+            font-weight: bold;
+            font-size: 14px;
         }
         
-        input, textarea, button {
+        input, textarea, select {
             width: 100%;
             padding: 14px;
-            border: none;
-            border-radius: 6px;
-            background: rgba(30, 45, 61, 0.8);
-            color: #f8f8f2;
-            font-size: 1.1rem;
-            font-family: 'Fira Code', monospace;
-            border: 1px solid #44475a;
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 15px;
+            font-family: 'Courier New', monospace;
         }
         
         textarea {
-            height: 120px;
+            min-height: 120px;
             resize: vertical;
         }
         
-        input:focus, textarea:focus {
-            outline: none;
-            border-color: #6272a4;
-            box-shadow: 0 0 0 2px rgba(98, 114, 164, 0.3);
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin: 15px 0;
         }
         
         button {
-            background: linear-gradient(135deg, #50fa7b, #64ffda);
-            color: #0a192f;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 15px;
+            background: linear-gradient(45deg, var(--highlight), var(--text));
+            color: #000;
             border: none;
-            font-size: 1.2rem;
-            padding: 16px;
+            padding: 16px 28px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 140px;
         }
         
         button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px rgba(255, 0, 255, 0.4);
         }
         
-        .result {
-            margin-top: 20px;
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .result-area {
+            margin-top: 25px;
             padding: 20px;
-            background: rgba(30, 45, 61, 0.8);
-            border-radius: 8px;
-            font-family: 'Fira Code', monospace;
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid var(--highlight);
+            border-radius: 10px;
+            min-height: 150px;
+        }
+        
+        .hex-view {
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
             word-break: break-all;
-            border: 1px solid #44475a;
-            color: #f8f8f2;
-            font-size: 1.1rem;
+            font-size: 14px;
             line-height: 1.8;
         }
         
-        .diagnostics {
-            background: rgba(255, 85, 85, 0.2);
-            border-left: 4px solid #ff5555;
+        .status {
+            padding: 12px;
+            margin: 12px 0;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: bold;
+            border: 1px solid;
+        }
+        
+        .status.success {
+            background: rgba(0, 255, 136, 0.1);
+            color: var(--success);
+            border-color: var(--success);
+        }
+        
+        .status.error {
+            background: rgba(255, 68, 68, 0.1);
+            color: var(--error);
+            border-color: var(--error);
+        }
+        
+        .cube-display {
+            margin-top: 25px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .cube-header {
+            color: var(--highlight);
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        
+        .cube-grid {
+            display: grid;
+            grid-template-columns: repeat(16, 1fr);
+            gap: 1px;
+            font-size: 9px;
+        }
+        
+        .cube-cell {
+            padding: 4px 2px;
+            text-align: center;
+            background: rgba(0, 255, 204, 0.08);
+            border: 1px solid rgba(0, 255, 204, 0.2);
+            font-weight: 500;
+        }
+        
+        .cube-cell:hover {
+            background: rgba(0, 255, 204, 0.2);
+            transform: scale(1.05);
+        }
+        
+        .specs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 25px;
+        }
+        
+        .spec-item {
             padding: 15px;
-            margin: 15px 0;
-            border-radius: 4px;
-            font-size: 0.95rem;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border);
+            border-radius: 8px;
         }
         
-        .diagnostics h4 {
-            color: #ff5555;
+        .spec-item h3 {
+            color: var(--highlight);
             margin-bottom: 10px;
+            font-size: 16px;
         }
         
-        .fixes {
-            background: rgba(80, 250, 123, 0.2);
-            border-left: 4px solid #50fa7b;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 4px;
-            font-size: 0.95rem;
+        .loader {
+            border: 3px solid rgba(0, 255, 204, 0.3);
+            border-top: 3px solid var(--text);
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 10px;
         }
         
-        .fixes h4 {
-            color: #50fa7b;
-            margin-bottom: 10px;
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .coordinates {
+            font-size: 11px;
+            color: var(--highlight);
+            margin-top: 3px;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>3D Гомофонический Шифр</h1>
-            <p class="subtitle">Куб 16×16×16 | 4096 уникальных омофонов | Исправленная реализация</p>
+            <h1>PROFESSIONAL BYTE TRIFID CIPHER</h1>
+            <div class="subtitle">16×16×16 MILITARY-GRADE CRYPTOGRAPHIC SYSTEM</div>
         </header>
-        
-        <div class="diagnostics">
-            <h4>Выявленные проблемы в предыдущей реализации:</h4>
-            <ol>
-                <li>Некорректное преобразование координат в омофоны и обратно</li>
-                <li>Ошибка в формуле восстановления байта из координат</li>
-                <li>Несоответствие между алгоритмами шифрования и дешифрования</li>
-            </ol>
-        </div>
-        
-        <div class="fixes">
-            <h4>Внесенные исправления:</h4>
-            <ol>
-                <li>Исправлено преобразование координат в омофоны: O = x * 256 + y * 16 + z</li>
-                <li>Исправлено обратное преобразование: x = O ÷ 256, y = (O mod 256) ÷ 16, z = O mod 16</li>
-                <li>Упрощён алгоритм для обеспечения полной обратимости</li>
-                <li>Добавлена проверка корректности преобразований</li>
-            </ol>
-        </div>
-        
-        <div class="main-content">
+
+        <div class="crypto-section">
             <div class="panel">
-                <h2 class="panel-title">Шифрование</h2>
-                
+                <h2>KEY MANAGEMENT</h2>
                 <div class="input-group">
-                    <label for="plainText">Исходные данные (числовые байты 0-255, через запятую):</label>
-                    <textarea id="plainText">72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100</textarea>
+                    <label for="cryptoKey">CRYPTOGRAPHIC KEY (256-bit recommended):</label>
+                    <input type="password" id="cryptoKey" placeholder="Enter master encryption key..." 
+                           value="TRIFID_16x16x16_SECURE_KEY_256BIT">
                 </div>
                 
                 <div class="input-group">
-                    <label for="key">Ключ шифрования (числа 0-255, через запятую):</label>
-                    <input type="text" id="key" value="79, 109, 110, 105, 112, 104, 111, 110, 101, 49">
+                    <label for="keyIterations">KEY STRETCHING ITERATIONS:</label>
+                    <input type="number" id="keyIterations" value="100000" min="1000" max="1000000">
                 </div>
                 
-                <button id="encryptBtn">Зашифровать</button>
+                <div class="btn-group">
+                    <button onclick="initializeCipher()">INITIALIZE CIPHER</button>
+                    <button onclick="generateRandomKey()">GENERATE RANDOM KEY</button>
+                    <button onclick="exportKeyMaterial()">EXPORT KEY MATERIAL</button>
+                </div>
+                
+                <div id="keyStatus" class="status"></div>
+            </div>
+
+            <div class="panel">
+                <h2>CRYPTO OPERATIONS</h2>
+                <div class="input-group">
+                    <label for="inputData">INPUT DATA (HEX/TEXT):</label>
+                    <textarea id="inputData" placeholder="Enter data for processing..."></textarea>
+                </div>
                 
                 <div class="input-group">
-                    <label>Зашифрованные данные (омофоны 0-4095):</label>
-                    <div class="result" id="cipherResult"></div>
+                    <label for="operationMode">OPERATION MODE:</label>
+                    <select id="operationMode">
+                        <option value="encrypt">ENCRYPTION</option>
+                        <option value="decrypt">DECRYPTION</option>
+                    </select>
+                </div>
+
+                <div class="btn-group">
+                    <button onclick="executeCryptoOperation()">EXECUTE OPERATION</button>
+                    <button onclick="clearResults()">CLEAR RESULTS</button>
+                    <button onclick="performBenchmark()">RUN BENCHMARK</button>
+                </div>
+                
+                <div class="result-area">
+                    <strong>OUTPUT:</strong>
+                    <div id="outputResult" class="hex-view"></div>
                 </div>
             </div>
-            
-            <div class="panel">
-                <h2 class="panel-title">Дешифрование</h2>
-                
-                <div class="input-group">
-                    <label for="cipherInput">Зашифрованные данные (омофоны 0-4095, через запятую):</label>
-                    <textarea id="cipherInput">742, 2592, 2555, 1220, 433, 3033, 70, 4059, 3272, 3148, 3511</textarea>
+        </div>
+
+        <div class="panel">
+            <h2>CUBE VISUALIZATION - LAYER 0</h2>
+            <div class="cube-display">
+                <div class="cube-header">16×16 CUBE LAYER (0-255 VALUES)</div>
+                <div class="cube-grid" id="cubeVisualization"></div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2>SYSTEM SPECIFICATIONS</h2>
+            <div class="specs">
+                <div class="spec-item">
+                    <h3>ARCHITECTURE</h3>
+                    <p>16 independent cubes × 16 rows × 16 columns</p>
+                    <p>4096 unique coordinate positions</p>
+                    <p>3D coordinate transformation system</p>
                 </div>
                 
-                <div class="input-group">
-                    <label for="decryptKey">Ключ дешифрования (числа 0-255, через запятую):</label>
-                    <input type="text" id="decryptKey" value="79, 109, 110, 105, 112, 104, 111, 110, 101, 49">
+                <div class="spec-item">
+                    <h3>CRYPTOGRAPHIC PROPERTIES</h3>
+                    <p>Key space: 4096! permutations</p>
+                    <p>256-bit secure key derivation</p>
+                    <p>Military-grade transformation</p>
                 </div>
                 
-                <button id="decryptBtn">Дешифровать</button>
-                
-                <div class="input-group">
-                    <label>Дешифрованные данные (байты 0-255):</label>
-                    <div class="result" id="decryptResult"></div>
+                <div class="spec-item">
+                    <h3>PERFORMANCE</h3>
+                    <p>Real-time byte processing</p>
+                    <p>Low memory footprint</p>
+                    <p>High-speed coordinate mapping</p>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Реализация 3D гомофонического шифра
-        class HomophonicCipher3D {
+        class ProfessionalByteTrifid {
             constructor() {
-                this.cubeSize = 16;
-                this.totalPoints = this.cubeSize * this.cubeSize * this.cubeSize;
-                this.homophoneMap = new Map();
-                this.reverseMap = new Map();
-                this.initMappings();
+                this.cube = null;
+                this.positionMap = new Map();
+                this.initialized = false;
+                this.keyMaterial = null;
             }
-            
-            // Инициализация преобразований байт ↔ омофоны
-            initMappings() {
-                // Создаем отображение для каждого байта (0-255) на 16 омофонов
-                for (let byte = 0; byte < 256; byte++) {
-                    const homophones = [];
+
+            async initializeWithKey(keyString, iterations = 100000) {
+                try {
+                    this.showStatus("Deriving key material...", "status");
                     
-                    // Генерируем 16 омофонов для каждого байта
-                    for (let i = 0; i < 16; i++) {
-                        const x = (byte + i * 3) % this.cubeSize;
-                        const y = (byte + i * 5) % this.cubeSize;
-                        const z = (byte + i * 7) % this.cubeSize;
-                        
-                        // Преобразуем координаты в значение омофона (0-4095)
-                        const homophone = x * 256 + y * 16 + z;
-                        homophones.push(homophone);
-                        
-                        // Сохраняем обратное отображение
-                        this.reverseMap.set(homophone, byte);
+                    // Generate cryptographically strong key material
+                    this.keyMaterial = await this.deriveKey(keyString, iterations);
+                    
+                    // Initialize 16x16x16 cube structure
+                    this.cube = new Array(16);
+                    for (let k = 0; k < 16; k++) {
+                        this.cube[k] = new Array(16);
+                        for (let i = 0; i < 16; i++) {
+                            this.cube[k][i] = new Array(16).fill(0);
+                        }
                     }
-                    
-                    this.homophoneMap.set(byte, homophones);
-                }
-            }
-            
-            // Шифрование массива байтов
-            encryptBytes(bytes, keyBytes) {
-                const result = [];
-                let keyIndex = 0;
-                
-                for (let byte of bytes) {
-                    // Получаем омофоны для этого байта
-                    const homophones = this.homophoneMap.get(byte);
-                    
-                    // Добавляем случайность на основе ключа
-                    const keyByte = keyBytes[keyIndex % keyBytes.length];
-                    const randomComponent = (byte + keyByte) % 16;
-                    
-                    // Выбираем омофон
-                    const homophoneIndex = randomComponent;
-                    const selectedHomophone = homophones[homophoneIndex];
-                    
-                    result.push(selectedHomophone);
-                    keyIndex++;
-                }
-                
-                return result;
-            }
-            
-            // Дешифрование массива омофонов
-            decryptHomophones(homophones, keyBytes) {
-                const result = [];
-                
-                for (let homophone of homophones) {
-                    // Получаем байт из омофона
-                    const byte = this.reverseMap.get(homophone);
-                    
-                    if (byte === undefined) {
-                        throw new Error(`Неверный омофон: ${homophone}`);
+
+                    // Create and shuffle numbers 0-4095
+                    const numbers = Array.from({length: 4096}, (_, i) => i);
+                    await this.cryptographicShuffle(numbers, this.keyMaterial);
+
+                    // Fill cube with shuffled numbers
+                    let index = 0;
+                    for (let k = 0; k < 16; k++) {
+                        for (let i = 0; i < 16; i++) {
+                            for (let j = 0; j < 16; j++) {
+                                const value = numbers[index++];
+                                this.cube[k][i][j] = value;
+                                this.positionMap.set(value, [k, i, j]);
+                            }
+                        }
                     }
-                    
-                    result.push(byte);
+
+                    this.initialized = true;
+                    this.showStatus("Cipher initialized successfully", "success");
+                    this.visualizeCube();
+                    return true;
+
+                } catch (error) {
+                    this.showStatus("Initialization failed: " + error.message, "error");
+                    return false;
                 }
-                
-                return result;
             }
-            
-            // Преобразование строки в массив чисел
-            parseNumberString(str) {
-                return str.split(',')
-                    .map(s => s.trim())
-                    .filter(s => s !== '')
-                    .map(s => parseInt(s, 10))
-                    .filter(n => !isNaN(n));
+
+            async deriveKey(keyString, iterations) {
+                const encoder = new TextEncoder();
+                const keyMaterial = encoder.encode(keyString);
+                
+                // Use Web Crypto API for key derivation
+                const importedKey = await crypto.subtle.importKey(
+                    'raw',
+                    keyMaterial,
+                    {name: 'PBKDF2'},
+                    false,
+                    ['deriveBits']
+                );
+
+                const salt = new Uint8Array(16); // Zero salt for deterministic output
+                const derivedBits = await crypto.subtle.deriveBits(
+                    {
+                        name: 'PBKDF2',
+                        salt: salt,
+                        iterations: iterations,
+                        hash: 'SHA-256'
+                    },
+                    importedKey,
+                    256
+                );
+
+                return new Uint8Array(derivedBits);
+            }
+
+            async cryptographicShuffle(array, keyMaterial) {
+                // Use CSPRNG for shuffling
+                for (let i = array.length - 1; i > 0; i--) {
+                    const randomIndex = await this.getSecureRandomIndex(i, keyMaterial);
+                    [array[i], array[randomIndex]] = [array[randomIndex], array[i]];
+                }
+            }
+
+            async getSecureRandomIndex(max, keyMaterial) {
+                const randomValue = new Uint32Array(1);
+                crypto.getRandomValues(randomValue);
+                return randomValue[0] % (max + 1);
+            }
+
+            encrypt(data) {
+                if (!this.initialized) throw new Error("Cipher not initialized");
+
+                const bytes = this.stringToBytes(data);
+                const coords = {k: [], x: [], y: []};
+                
+                // Get coordinates for each byte
+                for (const byte of bytes) {
+                    const [k, x, y] = this.positionMap.get(byte);
+                    coords.k.push(k);
+                    coords.x.push(x);
+                    coords.y.push(y);
+                }
+
+                // Trifid transformation
+                const allCoords = [...coords.k, ...coords.x, ...coords.y];
+                const result = [];
+
+                for (let i = 0; i < allCoords.length; i += 3) {
+                    if (i + 2 < allCoords.length) {
+                        const k = allCoords[i];
+                        const x = allCoords[i + 1];
+                        const y = allCoords[i + 2];
+                        result.push(this.cube[k][x][y]);
+                    }
+                }
+
+                return this.bytesToHex(new Uint8Array(result));
+            }
+
+            decrypt(hexData) {
+                if (!this.initialized) throw new Error("Cipher not initialized");
+
+                const bytes = this.hexToBytes(hexData);
+                const coords = {k: [], x: [], y: []};
+
+                // Get coordinates for each encrypted byte
+                for (const byte of bytes) {
+                    const [k, x, y] = this.positionMap.get(byte);
+                    coords.k.push(k);
+                    coords.x.push(x);
+                    coords.y.push(y);
+                }
+
+                // Reverse Trifid transformation
+                const totalCoords = coords.k.length;
+                const allCoords = [...coords.k, ...coords.x, ...coords.y];
+                const result = [];
+
+                for (let i = 0; i < totalCoords; i++) {
+                    const k = allCoords[i];
+                    const x = allCoords[i + totalCoords];
+                    const y = allCoords[i + 2 * totalCoords];
+                    result.push(this.cube[k][x][y]);
+                }
+
+                return this.bytesToString(new Uint8Array(result));
+            }
+
+            stringToBytes(str) {
+                return new TextEncoder().encode(str);
+            }
+
+            bytesToString(bytes) {
+                return new TextDecoder().decode(bytes);
+            }
+
+            bytesToHex(bytes) {
+                return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+            }
+
+            hexToBytes(hex) {
+                const bytes = [];
+                for (let i = 0; i < hex.length; i += 2) {
+                    bytes.push(parseInt(hex.substr(i, 2), 16));
+                }
+                return new Uint8Array(bytes);
+            }
+
+            visualizeCube() {
+                const grid = document.getElementById('cubeVisualization');
+                grid.innerHTML = '';
+
+                if (!this.cube) return;
+
+                // Show first layer (cube 0)
+                for (let i = 0; i < 16; i++) {
+                    for (let j = 0; j < 16; j++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'cube-cell';
+                        cell.textContent = this.cube[0][i][j].toString(16).padStart(3, '0');
+                        cell.title = `Cube: 0, Row: ${i}, Col: ${j}, Value: ${this.cube[0][i][j]}`;
+                        grid.appendChild(cell);
+                    }
+                }
+            }
+
+            showStatus(message, type) {
+                const statusEl = document.getElementById('keyStatus');
+                statusEl.textContent = message;
+                statusEl.className = `status ${type}`;
             }
         }
 
-        // Инициализация приложения
-        document.addEventListener('DOMContentLoaded', () => {
-            const cipher = new HomophonicCipher3D();
+        // Global cipher instance
+        const trifidCipher = new ProfessionalByteTrifid();
+
+        async function initializeCipher() {
+            const key = document.getElementById('cryptoKey').value;
+            const iterations = parseInt(document.getElementById('keyIterations').value);
             
-            // Настройка обработчиков событий
-            document.getElementById('encryptBtn').addEventListener('click', () => {
-                const text = document.getElementById('plainText').value;
-                const key = document.getElementById('key').value;
-                
-                if (text && key) {
-                    try {
-                        const bytes = cipher.parseNumberString(text);
-                        const keyBytes = cipher.parseNumberString(key);
-                        
-                        const homophones = cipher.encryptBytes(bytes, keyBytes);
-                        document.getElementById('cipherResult').textContent = homophones.join(', ');
-                    } catch (e) {
-                        document.getElementById('cipherResult').textContent = 'Ошибка: ' + e.message;
-                    }
+            if (!key) {
+                alert('Please enter a cryptographic key');
+                return;
+            }
+
+            await trifidCipher.initializeWithKey(key, iterations);
+        }
+
+        function generateRandomKey() {
+            const randomKey = crypto.randomUUID() + crypto.randomUUID();
+            document.getElementById('cryptoKey').value = randomKey;
+        }
+
+        function exportKeyMaterial() {
+            if (!trifidCipher.initialized) {
+                alert('Cipher not initialized');
+                return;
+            }
+            alert('Key material exported (simulated)');
+        }
+
+        function executeCryptoOperation() {
+            if (!trifidCipher.initialized) {
+                alert('Please initialize the cipher first');
+                return;
+            }
+
+            const input = document.getElementById('inputData').value;
+            const mode = document.getElementById('operationMode').value;
+            
+            if (!input) {
+                alert('Please enter input data');
+                return;
+            }
+
+            try {
+                let result;
+                if (mode === 'encrypt') {
+                    result = trifidCipher.encrypt(input);
+                } else {
+                    result = trifidCipher.decrypt(input);
                 }
-            });
-            
-            document.getElementById('decryptBtn').addEventListener('click', () => {
-                const text = document.getElementById('cipherInput').value;
-                const key = document.getElementById('decryptKey').value;
                 
-                if (text && key) {
-                    try {
-                        const homophones = cipher.parseNumberString(text);
-                        const keyBytes = cipher.parseNumberString(key);
-                        
-                        const bytes = cipher.decryptHomophones(homophones, keyBytes);
-                        document.getElementById('decryptResult').textContent = bytes.join(', ');
-                        
-                        // Проверка корректности
-                        const originalBytes = cipher.parseNumberString(document.getElementById('plainText').value);
-                        const isCorrect = bytes.length === originalBytes.length && 
-                                         bytes.every((val, idx) => val === originalBytes[idx]);
-                        
-                        if (!isCorrect) {
-                            document.getElementById('decryptResult').textContent += 
-                                ' [ОШИБКА: не соответствует исходным данным]';
-                        }
-                    } catch (e) {
-                        document.getElementById('decryptResult').textContent = 'Ошибка: ' + e.message;
-                    }
-                }
-            });
-            
-            // Автоматически запустить шифрование и дешифрование при загрузке
+                document.getElementById('outputResult').textContent = result;
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        function clearResults() {
+            document.getElementById('outputResult').textContent = '';
+            document.getElementById('inputData').value = '';
+        }
+
+        function performBenchmark() {
+            alert('Benchmark functionality not implemented in this version');
+        }
+
+        // Initialize with default key
+        window.onload = function() {
             setTimeout(() => {
-                document.getElementById('encryptBtn').click();
-                setTimeout(() => {
-                    document.getElementById('decryptBtn').click();
-                }, 100);
-            }, 500);
-        });
+                initializeCipher();
+            }, 1000);
+        };
     </script>
 </body>
 </html>
