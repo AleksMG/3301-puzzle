@@ -1,168 +1,393 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3301 - Level 1</title>
+    <title>Исправленный омонофонный шифр</title>
     <style>
-        :root {
-            --glow-color: #0f0;
-            --bg-color: #000;
-        }
-        body {
-            background-color: var(--bg-color);
-            color: var(--glow-color);
-            font-family: 'Courier New', monospace;
+        * {
+            box-sizing: border-box;
             margin: 0;
-            padding: 20px;
-            overflow: hidden;
+            padding: 0;
+            font-family: 'Consolas', 'Monaco', monospace;
         }
+        
+        body {
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
         .container {
-            max-width: 800px;
-            margin: 0 auto;
-            border: 1px solid var(--glow-color);
-            padding: 20px;
-            box-shadow: 0 0 10px var(--glow-color);
-            background: rgba(15, 30, 15, 0.1);
+            width: 100%;
+            max-width: 900px;
+            background: rgba(25, 25, 35, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            padding: 30px;
+            border: 1px solid #444;
         }
-        .header {
+        
+        h1 {
             text-align: center;
-            margin-bottom: 30px;
-            border-bottom: 1px solid var(--glow-color);
-            padding-bottom: 10px;
+            color: #4fc3f7;
+            margin-bottom: 25px;
+            font-size: 2.2rem;
+            text-shadow: 0 0 10px rgba(79, 195, 247, 0.5);
         }
-        .blink {
-            animation: blink 1s step-end infinite;
+        
+        .key-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
         }
-        @keyframes blink {
-            50% { opacity: 0; }
-        }
-        #password-input {
-            background: var(--bg-color);
-            border: 1px solid var(--glow-color);
-            color: var(--glow-color);
-            padding: 10px;
-            font-family: 'Courier New', monospace;
-            width: 300px;
-            margin: 20px 0;
+        
+        .key-controls input {
+            padding: 12px;
+            background: #1a1a2a;
+            border: 2px solid #444;
+            border-radius: 8px;
+            color: #fff;
             font-size: 16px;
         }
-        #submit-btn {
-            background: var(--bg-color);
-            border: 1px solid var(--glow-color);
-            color: var(--glow-color);
-            padding: 10px 20px;
-            font-family: 'Courier New', monospace;
+        
+        .key-controls button {
+            padding: 12px;
+            background: #4fc3f7;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            grid-column: span 2;
+        }
+        
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 15px;
+            background: #1a1a2a;
+            border: 2px solid #444;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 16px;
+            resize: vertical;
+            margin-bottom: 20px;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin: 25px 0;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 14px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
             cursor: pointer;
             transition: all 0.3s;
+            flex: 1;
+            min-width: 150px;
         }
-        #submit-btn:hover {
-            background: rgba(0, 80, 0, 0.3);
-            box-shadow: 0 0 15px var(--glow-color);
+        
+        #encryptBtn {
+            background: linear-gradient(135deg, #00c6ff, #0072ff);
+            color: white;
         }
-        .message {
-            margin: 15px 0;
-            min-height: 1.5em;
+        
+        #decryptBtn {
+            background: linear-gradient(135deg, #f46b45, #eea849);
+            color: white;
         }
-        .error {
-            color: #f00;
-            text-shadow: 0 0 5px #f00;
+        
+        #clearBtn {
+            background: linear-gradient(135deg, #8e8e8e, #696969);
+            color: white;
         }
-        .success {
-            color: #0f0;
-            text-shadow: 0 0 5px #0f0;
+        
+        .result {
+            background: #1a1a2a;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border-left: 5px solid #4fc3f7;
         }
-        .hidden {
-            display: none;
+        
+        .output {
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+            padding: 15px;
+            background: #0a0a14;
+            color: #4fc3f7;
+            border-radius: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #444;
         }
-        .terminal-text {
-            line-height: 1.6;
-            margin: 10px 0;
+        
+        .math-info {
+            background: #1a1a2a;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border: 1px solid #444;
+        }
+        
+        .status {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            background: #2a2a3a;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>// SYSTEM ACCESS POINT: LEVEL 1</h1>
-            <p>3301 ENCRYPTION PROTOCOL</p>
+        <h1>Исправленный омонофонный шифр</h1>
+        
+        <div class="key-controls">
+            <input type="number" id="primeP" placeholder="Простое число p" value="61">
+            <input type="number" id="primeQ" placeholder="Простое число q" value="53">
+            <button id="generateKeys">Сгенерировать новые ключи</button>
         </div>
         
-        <div class="terminal-text">
-            <p>> Initializing authentication sequence...</p>
-            <p>> Security protocols: ACTIVE</p>
-            <p>> Ciphertext detected: <span class="blink">KRZ DUH BRX?</span></p>
-            <p class="blink">> Enter decryption key:</p>
+        <div class="status" id="keyStatus">Статус ключей: Не инициализированы</div>
+        
+        <textarea id="inputText" placeholder="Введите текст для шифрования">Hello World 123!</textarea>
+        
+        <div class="buttons">
+            <button id="encryptBtn">Зашифровать</button>
+            <button id="decryptBtn">Расшифровать</button>
+            <button id="clearBtn">Очистить</button>
         </div>
         
-        <div id="access-form">
-            <input type="password" id="password-input" autocomplete="off" autofocus>
-            <br>
-            <button id="submit-btn">AUTHENTICATE</button>
+        <div class="result">
+            <h2>Результат</h2>
+            <div class="output" id="outputResult">Здесь будет результат...</div>
         </div>
         
-        <div id="response" class="message"></div>
-        
-        <div id="success" class="hidden">
-            <div class="terminal-text success">
-                <p>> Authentication successful!</p>
-                <p>> Security clearance: LEVEL 2 GRANTED</p>
-                <p>> Redirecting to next gateway...</p>
-            </div>
+        <div class="math-info">
+            <h3>Математическая основа:</h3>
+            <p>• K = 65536 (масштабирующий множитель)</p>
+            <p>• X = M + i × K, где i ∈ [1, floor((N-256)/K)]</p>
+            <p>• Шифрование: C = X<sup>e</sup> mod N</p>
+            <p>• Дешифрование: M = (C<sup>d</sup> mod N) mod K</p>
+            <p>• Гарантированная непересекаемость омофонов</p>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const passwordInput = document.getElementById('password-input');
-            const submitBtn = document.getElementById('submit-btn');
-            const responseDiv = document.getElementById('response');
-            const successDiv = document.getElementById('success');
-            const accessForm = document.getElementById('access-form');
+            const primePInput = document.getElementById('primeP');
+            const primeQInput = document.getElementById('primeQ');
+            const generateKeysBtn = document.getElementById('generateKeys');
+            const keyStatus = document.getElementById('keyStatus');
+            const inputText = document.getElementById('inputText');
+            const encryptBtn = document.getElementById('encryptBtn');
+            const decryptBtn = document.getElementById('decryptBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const outputResult = document.getElementById('outputResult');
             
-            // Caesar cipher shift function
-            function caesarDecrypt(text, shift) {
-                return text.split('').map(char => {
-                    if (char.match(/[A-Z]/i)) {
-                        const code = char.charCodeAt(0);
-                        const base = code > 90 ? 97 : 65;
-                        return String.fromCharCode(((code - base + (26 - shift)) % 26) + base);
-                    }
-                    return char;
-                }).join('');
+            let n, e, d, phi, max_i;
+            const K = 65536; // Масштабирующий множитель (2^16)
+            
+            // Функция для вычисления НОД
+            function gcd(a, b) {
+                return b === 0 ? a : gcd(b, a % b);
             }
             
-            // Handle password submission
-            function authenticate() {
-                const userInput = passwordInput.value.trim().toUpperCase();
+            // Функция для вычисления модульного обратного
+            function modInverse(a, m) {
+                let [old_r, r] = [a, m];
+                let [old_s, s] = [1, 0];
+                let [old_t, t] = [0, 1];
                 
-                // Decrypt ciphertext with Caesar shift 3
-                const decrypted = caesarDecrypt("KRZ DUH BRX?", 3);
-                
-                if (userInput === decrypted || userInput === "WHOAREYOU") {
-                    responseDiv.innerHTML = '';
-                    accessForm.classList.add('hidden');
-                    successDiv.classList.remove('hidden');
-                    
-                    // Redirect to next level after delay
-                    setTimeout(() => {
-                        window.location.href = 'gateway.html';
-                    }, 3000);
-                } else {
-                    responseDiv.innerHTML = '<p class="error">> ACCESS DENIED: Invalid credentials</p>';
-                    passwordInput.value = '';
-                    passwordInput.focus();
+                while (r !== 0) {
+                    const quotient = Math.floor(old_r / r);
+                    [old_r, r] = [r, old_r - quotient * r];
+                    [old_s, s] = [s, old_s - quotient * s];
+                    [old_t, t] = [t, old_t - quotient * t];
                 }
+                
+                return old_s < 0 ? old_s + m : old_s;
             }
             
-            // Event listeners
-            submitBtn.addEventListener('click', authenticate);
-            passwordInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') authenticate();
+            // Функция для быстрого возведения в степень по модулю
+            function modExp(base, exponent, modulus) {
+                if (modulus === 1n) return 0n;
+                let result = 1n;
+                let b = BigInt(base) % BigInt(modulus);
+                let exp = BigInt(exponent);
+                
+                while (exp > 0n) {
+                    if (exp % 2n === 1n) {
+                        result = (result * b) % BigInt(modulus);
+                    }
+                    b = (b * b) % BigInt(modulus);
+                    exp = exp >> 1n;
+                }
+                
+                return Number(result);
+            }
+            
+            // Инициализация ключей
+            function initKeys() {
+                const p = parseInt(primePInput.value);
+                const q = parseInt(primeQInput.value);
+                
+                if (isNaN(p) || isNaN(q) || p === q) {
+                    outputResult.textContent = 'Ошибка: p и q должны быть разными простыми числами';
+                    keyStatus.textContent = 'Статус ключей: Ошибка';
+                    keyStatus.style.background = '#ff4757';
+                    return false;
+                }
+                
+                n = p * q;
+                phi = (p - 1) * (q - 1);
+                
+                // Выбор открытой экспоненты
+                e = 65537;
+                while (gcd(e, phi) !== 1) {
+                    e++;
+                }
+                
+                // Вычисление закрытой экспоненты
+                d = modInverse(e, phi);
+                
+                // Вычисление максимального i
+                max_i = Math.floor((n - 255) / K);
+                if (max_i < 1) {
+                    outputResult.textContent = 'Ошибка: модуль n слишком мал для выбранного K';
+                    keyStatus.textContent = 'Статус ключей: Ошибка';
+                    keyStatus.style.background = '#ff4757';
+                    return false;
+                }
+                
+                keyStatus.textContent = `Статус ключей: OK (n=${n}, max_i=${max_i})`;
+                keyStatus.style.background = '#2a2a3a';
+                return true;
+            }
+            
+            // Функция шифрования
+            function encrypt(text) {
+                if (!initKeys()) return null;
+                
+                const result = [];
+                
+                for (let idx = 0; idx < text.length; idx++) {
+                    const M = text.charCodeAt(idx);
+                    // Случайный выбор омофона для этого символа
+                    const i = Math.floor(Math.random() * max_i) + 1;
+                    
+                    // X = M + i * K (гарантирует непересекаемость)
+                    const X = M + i * K;
+                    
+                    if (X >= n) {
+                        outputResult.textContent = `Ошибка: X=${X} >= n=${n}`;
+                        return null;
+                    }
+                    
+                    // Шифрование: C = X^e mod n
+                    const C = modExp(X, e, n);
+                    
+                    result.push(C.toString());
+                }
+                
+                return result.join(' ');
+            }
+            
+            // Функция дешифрования
+            function decrypt(cipherText) {
+                if (!initKeys()) return null;
+                
+                const cipherArray = cipherText.split(' ').filter(x => x !== '');
+                const result = [];
+                
+                for (const cipherNum of cipherArray) {
+                    const C = parseInt(cipherNum);
+                    
+                    if (isNaN(C)) {
+                        outputResult.textContent = 'Ошибка: неверный формат шифротекста';
+                        return null;
+                    }
+                    
+                    // Дешифрование: X = C^d mod n
+                    const X = modExp(C, d, n);
+                    
+                    // Восстановление исходного символа: M = X mod K
+                    const M = X % K;
+                    
+                    if (M < 0 || M > 255) {
+                        outputResult.textContent = `Ошибка: некорректное значение M=${M}`;
+                        return null;
+                    }
+                    
+                    result.push(String.fromCharCode(M));
+                }
+                
+                return result.join('');
+            }
+            
+            // Обработчики событий
+            generateKeysBtn.addEventListener('click', function() {
+                // Большие простые числа для обеспечения достаточного диапазона
+                const primes = [211, 223, 227, 229, 233, 239, 241, 251, 257, 263];
+                primePInput.value = primes[Math.floor(Math.random() * primes.length)];
+                
+                let q;
+                do {
+                    q = primes[Math.floor(Math.random() * primes.length)];
+                } while (q === parseInt(primePInput.value));
+                
+                primeQInput.value = q;
+                
+                if (initKeys()) {
+                    outputResult.textContent = 'Новые ключи сгенерированы!';
+                }
             });
             
-            // Initial focus
-            passwordInput.focus();
+            encryptBtn.addEventListener('click', function() {
+                const text = inputText.value;
+                if (!text) {
+                    outputResult.textContent = 'Введите текст для шифрования';
+                    return;
+                }
+                
+                const encrypted = encrypt(text);
+                if (encrypted) {
+                    outputResult.textContent = encrypted;
+                }
+            });
+            
+            decryptBtn.addEventListener('click', function() {
+                const text = inputText.value;
+                if (!text) {
+                    outputResult.textContent = 'Введите текст для расшифрования';
+                    return;
+                }
+                
+                const decrypted = decrypt(text);
+                if (decrypted) {
+                    outputResult.textContent = decrypted;
+                }
+            });
+            
+            clearBtn.addEventListener('click', function() {
+                inputText.value = '';
+                outputResult.textContent = 'Здесь будет результат...';
+            });
+            
+            // Инициализация при загрузке
+            initKeys();
         });
     </script>
 </body>
