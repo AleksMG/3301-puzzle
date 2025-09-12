@@ -3,408 +3,688 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Омонофонный шифр с большими числами</title>
+    <title>3D Гомофонический Шифр</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Consolas', 'Monaco', monospace;
+            box-sizing: border-box;
+            font-family: 'Fira Code', 'Cascadia Code', monospace;
         }
         
         body {
-            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-            color: #e0e0e0;
+            background: linear-gradient(135deg, #0a192f, #112240, #0a192f);
+            color: #64ffda;
             min-height: 100vh;
             padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            line-height: 1.6;
         }
         
         .container {
-            width: 100%;
-            max-width: 1000px;
-            background: rgba(25, 25, 35, 0.95);
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            padding: 30px;
-            border: 1px solid #444;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(23, 42, 69, 0.8);
+            border-radius: 10px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            border: 1px solid #64ffda;
         }
         
         h1 {
-            text-align: center;
-            color: #4fc3f7;
-            margin-bottom: 25px;
-            font-size: 2.2rem;
-            text-shadow: 0 0 10px rgba(79, 195, 247, 0.5);
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            color: #64ffda;
+            text-shadow: 0 0 10px rgba(100, 255, 218, 0.5);
         }
         
-        .key-controls {
+        .subtitle {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            color: #8892b0;
+        }
+        
+        .main-content {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 25px;
+            gap: 30px;
+            margin-bottom: 40px;
         }
         
-        .key-controls input {
-            padding: 12px;
-            background: #1a1a2a;
-            border: 2px solid #444;
-            border-radius: 8px;
-            color: #fff;
-            font-size: 16px;
+        @media (max-width: 1100px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
         }
         
-        .key-controls button {
-            padding: 12px;
-            background: #4fc3f7;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            grid-column: span 2;
+        .panel {
+            background: rgba(23, 42, 69, 0.8);
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            border: 1px solid #1e2d3d;
         }
         
-        textarea {
-            width: 100%;
-            min-height: 120px;
-            padding: 15px;
-            background: #1a1a2a;
-            border: 2px solid #444;
-            border-radius: 8px;
-            color: #fff;
-            font-size: 16px;
-            resize: vertical;
+        .panel-title {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #64ffda;
+            border-bottom: 2px solid #64ffda;
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .panel-title::before {
+            content: "> ";
+            color: #ff79c6;
+            margin-right: 10px;
+        }
+        
+        .input-group {
             margin-bottom: 20px;
         }
         
-        .buttons {
-            display: flex;
-            gap: 15px;
-            margin: 25px 0;
-            flex-wrap: wrap;
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #50fa7b;
+            font-size: 1.1rem;
+        }
+        
+        input, textarea, button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 6px;
+            background: rgba(30, 45, 61, 0.8);
+            color: #f8f8f2;
+            font-size: 1.1rem;
+            font-family: 'Fira Code', monospace;
+            border: 1px solid #44475a;
+        }
+        
+        textarea {
+            height: 120px;
+            resize: vertical;
+        }
+        
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #6272a4;
+            box-shadow: 0 0 0 2px rgba(98, 114, 164, 0.3);
         }
         
         button {
-            padding: 14px 25px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
+            background: linear-gradient(135deg, #50fa7b, #64ffda);
+            color: #0a192f;
+            font-weight: bold;
             cursor: pointer;
-            transition: all 0.3s;
-            flex: 1;
-            min-width: 150px;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+            border: none;
+            font-size: 1.2rem;
+            padding: 16px;
         }
         
-        #encryptBtn {
-            background: linear-gradient(135deg, #00c6ff, #0072ff);
-            color: white;
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
         }
         
-        #decryptBtn {
-            background: linear-gradient(135deg, #f46b45, #eea849);
-            color: white;
+        .visualization {
+            height: 450px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+            background: #0a192f;
+            border: 1px solid #64ffda;
+            margin-bottom: 30px;
         }
         
-        #clearBtn {
-            background: linear-gradient(135deg, #8e8e8e, #696969);
-            color: white;
+        #cube-container {
+            width: 100%;
+            height: 100%;
         }
         
         .result {
-            background: #1a1a2a;
-            padding: 20px;
-            border-radius: 10px;
             margin-top: 20px;
-            border-left: 5px solid #4fc3f7;
-        }
-        
-        .output {
-            font-family: monospace;
-            white-space: pre-wrap;
+            padding: 20px;
+            background: rgba(30, 45, 61, 0.8);
+            border-radius: 8px;
+            font-family: 'Fira Code', monospace;
             word-break: break-all;
-            padding: 15px;
-            background: #0a0a14;
-            color: #4fc3f7;
-            border-radius: 8px;
-            max-height: 300px;
-            overflow-y: auto;
-            border: 1px solid #444;
+            border: 1px solid #44475a;
+            color: #f8f8f2;
+            font-size: 1.1rem;
+            line-height: 1.8;
         }
         
-        .math-info {
-            background: #1a1a2a;
-            padding: 15px;
+        .math-section {
+            margin-top: 40px;
+            background: rgba(23, 42, 69, 0.8);
+            border-radius: 10px;
+            padding: 30px;
+            border: 1px solid #1e2d3d;
+        }
+        
+        .math-title {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #64ffda;
+            border-bottom: 2px solid #64ffda;
+            padding-bottom: 10px;
+        }
+        
+        .formula {
+            background: rgba(30, 45, 61, 0.8);
             border-radius: 8px;
+            padding: 20px;
             margin: 20px 0;
-            border: 1px solid #444;
-            font-size: 14px;
+            font-family: 'Fira Code', monospace;
+            overflow-x: auto;
+            border: 1px solid #44475a;
+            color: #f8f8f2;
         }
         
-        .status {
-            margin-top: 10px;
-            padding: 10px;
-            border-radius: 5px;
-            background: #2a2a3a;
-            font-size: 14px;
+        .algorithm {
+            background: rgba(30, 45, 61, 0.8);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid #44475a;
         }
         
-        .big-number {
-            word-break: break-all;
-            font-size: 12px;
+        .algorithm ol {
+            padding-left: 30px;
+        }
+        
+        .algorithm li {
+            margin-bottom: 15px;
+            color: #f8f8f2;
+            font-size: 1.1rem;
+        }
+        
+        .algorithm h3 {
+            color: #ff79c6;
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .stat-box {
+            background: rgba(30, 45, 61, 0.8);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid #44475a;
+        }
+        
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: #ff79c6;
+            margin-bottom: 8px;
+        }
+        
+        .stat-label {
+            font-size: 1.1rem;
+            color: #50fa7b;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 30px;
+            opacity: 0.7;
+            font-size: 1rem;
+            color: #6272a4;
+        }
+        
+        .byte-value {
+            color: #ff79c6;
+            font-weight: bold;
+        }
+        
+        .coordinate {
+            color: #50fa7b;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Омонофонный шифр с большими числами</h1>
+        <header>
+            <h1>3D Гомофонический Шифр</h1>
+            <p class="subtitle">Куб 16×16×16 | Омофоны 0001-4096 | Профессиональная реализация</p>
+        </header>
         
-        <div class="key-controls">
-            <input type="text" id="primeP" placeholder="Простое число p" value="1125899839733759">
-            <input type="text" id="primeQ" placeholder="Простое число q" value="18014398241046527">
-            <button id="generateKeys">Использовать предустановленные ключи</button>
+        <div class="main-content">
+            <div class="panel">
+                <h2 class="panel-title">Шифрование</h2>
+                
+                <div class="input-group">
+                    <label for="plainText">Исходные данные (байты):</label>
+                    <textarea id="plainText" placeholder="Введите данные для шифрования">48656C6C6F20576F726C64</textarea>
+                </div>
+                
+                <div class="input-group">
+                    <label for="key">Ключ шифрования (hex):</label>
+                    <input type="text" id="key" value="4F6D6E6950686F6E65313233" placeholder="Введите ключ в hex-формате">
+                </div>
+                
+                <button id="encryptBtn">Зашифровать</button>
+                
+                <div class="input-group">
+                    <label>Зашифрованные данные (омофоны):</label>
+                    <div class="result" id="cipherResult">Результат появится здесь</div>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <h2 class="panel-title">Дешифрование</h2>
+                
+                <div class="input-group">
+                    <label for="cipherText">Зашифрованные данные (омофоны):</label>
+                    <textarea id="cipherText" placeholder="Введите омофоны для дешифрования"></textarea>
+                </div>
+                
+                <div class="input-group">
+                    <label for="decryptKey">Ключ дешифрования (hex):</label>
+                    <input type="text" id="decryptKey" value="4F6D6E6950686F6E65313233" placeholder="Введите ключ в hex-формате">
+                </div>
+                
+                <button id="decryptBtn">Дешифровать</button>
+                
+                <div class="input-group">
+                    <label>Дешифрованные данные (байты):</label>
+                    <div class="result" id="decryptResult">Результат появится здесь</div>
+                </div>
+            </div>
         </div>
         
-        <div class="status" id="keyStatus">Статус ключей: Не инициализированы</div>
-        
-        <textarea id="inputText" placeholder="Введите текст для шифрования">Hello World! Test 123</textarea>
-        
-        <div class="buttons">
-            <button id="encryptBtn">Зашифровать</button>
-            <button id="decryptBtn">Расшифровать</button>
-            <button id="clearBtn">Очистить</button>
+        <div class="panel">
+            <h2 class="panel-title">3D Визуализация Куб 16×16×16</h2>
+            <div class="visualization">
+                <div id="cube-container"></div>
+            </div>
+            
+            <div class="stats">
+                <div class="stat-box">
+                    <div class="stat-value" id="pointCount">0</div>
+                    <div class="stat-label">Всего точек в кубе</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="byteCount">0</div>
+                    <div class="stat-label">Байтов обработано</div>
+                </div>
+            </div>
         </div>
         
-        <div class="result">
-            <h2>Результат</h2>
-            <div class="output" id="outputResult">Здесь будет результат...</div>
+        <div class="math-section">
+            <h2 class="math-title">Математическая основа алгоритма</h2>
+            
+            <div class="algorithm">
+                <h3>Алгоритм шифрования:</h3>
+                <ol>
+                    <li>Преобразовать входные данные в последовательность байтов</li>
+                    <li>Для каждого байта B определить 16 омофонов в кубе:
+                        <div class="formula">H = { (x, y, z) | x, y, z ∈ [0,15], f(B, x, y, z) = 0 }</div>
+                    </li>
+                    <li>Используя ключ K, выбрать один омофон из H:
+                        <div class="formula">index = (B + K[i mod len(K)]) mod 16</div>
+                    </li>
+                    <li>Преобразовать выбранную точку (x,y,z) в значение омофона:
+                        <div class="formula">O = x × 256 + y × 16 + z + 1</div>
+                    </li>
+                </ol>
+            </div>
+            
+            <div class="algorithm">
+                <h3>Алгоритм дешифрования:</h3>
+                <ol>
+                    <li>Для каждого омофона O вычислить координаты точки:
+                        <div class="formula">O' = O - 1; x = O' ÷ 256; y = (O' mod 256) ÷ 16; z = O' mod 16</div>
+                    </li>
+                    <li>Используя ключ K, восстановить исходный байт:
+                        <div class="formula">B = (f⁻¹(x, y, z) - K[i mod len(K)] + 256) mod 256</div>
+                    </li>
+                </ol>
+            </div>
+            
+            <div class="formula">
+                <h3>Формула преобразования байта в координаты:</h3>
+                <p>Для байта B и индекса i ∈ [0,15]:</p>
+                <p>x = (B + i) mod 16</p>
+                <p>y = (B × 7 + i × 11) mod 16</p>
+                <p>z = (B × 13 + i × 17) mod 16</p>
+            </div>
+            
+            <div class="formula">
+                <h3>Формула восстановления байта из координат:</h3>
+                <p>Для координат (x, y, z):</p>
+                <p>B = (x - i + 16) mod 16, где i ∈ [0,15] определяется из y и z</p>
+            </div>
         </div>
         
-        <div class="math-info">
-            <h3>Математическая основа:</h3>
-            <p>• K = 65536 (масштабирующий множитель 2¹⁶)</p>
-            <p>• Большие простые числа: p и q (50-60 бит)</p>
-            <p>• N = p × q (100+ бит)</p>
-            <p>• X = M + i × K, где i ∈ [1, floor((N-255)/K)]</p>
-            <p>• Шифрование: C = X<sup>e</sup> mod N</p>
-            <p>• Дешифрование: X = C<sup>d</sup> mod N, M = X mod K</p>
-        </div>
+        <footer>
+            <p>3D Гомофонический Шифр | Профессиональная реализация | Куб 16×16×16 | Омофоны 0001-4096</p>
+        </footer>
     </div>
 
     <script>
-        // Большие простые числа (50-60 бит)
-        const BIG_PRIMES = [
-            '1125899839733759',    // ~50 бит
-            '18014398241046527',   // ~54 бит  
-            '288230375614840831',  // ~58 бит
-            '1152921504606847003', // ~60 бит
-            '4611686018427387877'  // ~62 бита
-        ];
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const primePInput = document.getElementById('primeP');
-            const primeQInput = document.getElementById('primeQ');
-            const generateKeysBtn = document.getElementById('generateKeys');
-            const keyStatus = document.getElementById('keyStatus');
-            const inputText = document.getElementById('inputText');
-            const encryptBtn = document.getElementById('encryptBtn');
-            const decryptBtn = document.getElementById('decryptBtn');
-            const clearBtn = document.getElementById('clearBtn');
-            const outputResult = document.getElementById('outputResult');
-            
-            let n, e, d, phi, max_i;
-            const K = 65536; // Масштабирующий множитель (2^16)
-            const E = 65537; // Открытая экспонента
-            
-            // Функция для вычисления НОД (Большие числа)
-            function gcd(a, b) {
-                a = BigInt(a);
-                b = BigInt(b);
-                while (b !== 0n) {
-                    [a, b] = [b, a % b];
-                }
-                return Number(a);
+        // Реализация 3D гомофонического шифра
+        class HomophonicCipher3D {
+            constructor() {
+                this.cubeSize = 16;
+                this.totalPoints = this.cubeSize * this.cubeSize * this.cubeSize;
+                this.homophoneMap = new Map();
+                this.reverseMap = new Map();
+                this.initMappings();
             }
             
-            // Расширенный алгоритм Евклида для больших чисел
-            function modInverse(a, m) {
-                let [old_r, r] = [BigInt(a), BigInt(m)];
-                let [old_s, s] = [1n, 0n];
-                let [old_t, t] = [0n, 1n];
-                
-                while (r !== 0n) {
-                    const quotient = old_r / r;
-                    [old_r, r] = [r, old_r - quotient * r];
-                    [old_s, s] = [s, old_s - quotient * s];
-                    [old_t, t] = [t, old_t - quotient * t];
-                }
-                
-                return old_s < 0n ? old_s + BigInt(m) : old_s;
-            }
-            
-            // Быстрое возведение в степень по модулю для больших чисел
-            function modExp(base, exponent, modulus) {
-                if (modulus === 1n) return 0n;
-                let result = 1n;
-                let b = BigInt(base) % BigInt(modulus);
-                let exp = BigInt(exponent);
-                
-                while (exp > 0n) {
-                    if (exp % 2n === 1n) {
-                        result = (result * b) % BigInt(modulus);
+            // Инициализация преобразований байт ↔ омофоны
+            initMappings() {
+                // Создаем отображение для каждого байта (0-255) на 16 омофонов
+                for (let byte = 0; byte < 256; byte++) {
+                    const homophones = [];
+                    
+                    // Генерируем 16 омофонов для каждого байта
+                    for (let i = 0; i < 16; i++) {
+                        const x = (byte + i) % this.cubeSize;
+                        const y = (byte * 7 + i * 11) % this.cubeSize;
+                        const z = (byte * 13 + i * 17) % this.cubeSize;
+                        
+                        // Преобразуем координаты в значение омофона (1-4096)
+                        const homophone = x * 256 + y * 16 + z + 1;
+                        homophones.push(homophone);
+                        
+                        // Сохраняем обратное отображение
+                        this.reverseMap.set(homophone, { byte, index: i });
                     }
-                    b = (b * b) % BigInt(modulus);
-                    exp = exp >> 1n;
+                    
+                    this.homophoneMap.set(byte, homophones);
+                }
+            }
+            
+            // Шифрование массива байтов
+            encryptBytes(bytes, keyBytes) {
+                const result = [];
+                let keyIndex = 0;
+                
+                for (let byte of bytes) {
+                    // Получаем омофоны для этого байта
+                    const homophones = this.homophoneMap.get(byte);
+                    
+                    // Выбираем омофон на основе ключа
+                    const keyByte = keyBytes[keyIndex % keyBytes.length];
+                    const homophoneIndex = (byte + keyByte) % homophones.length;
+                    const selectedHomophone = homophones[homophoneIndex];
+                    
+                    result.push(selectedHomophone);
+                    keyIndex++;
                 }
                 
                 return result;
             }
             
-            // Инициализация ключей
-            function initKeys() {
-                const p = primePInput.value;
-                const q = primeQInput.value;
-                
-                if (!p || !q || p === q) {
-                    outputResult.textContent = 'Ошибка: p и q должны быть разными простыми числами';
-                    return false;
-                }
-                
-                // Используем BigInt для больших чисел
-                n = BigInt(p) * BigInt(q);
-                phi = (BigInt(p) - 1n) * (BigInt(q) - 1n);
-                
-                // Проверяем, что e и phi взаимно просты
-                if (gcd(E, Number(phi)) !== 1) {
-                    outputResult.textContent = 'Ошибка: e и φ(n) не взаимно просты';
-                    return false;
-                }
-                
-                // Вычисление закрытой экспоненты
-                d = modInverse(E, phi);
-                
-                // Вычисление максимального i
-                const n_num = Number(n);
-                max_i = Math.floor((n_num - 255) / K);
-                
-                if (max_i < 1000) {
-                    outputResult.textContent = 'Ошибка: модуль n слишком мал. Нужны бóльшие простые числа.';
-                    return false;
-                }
-                
-                keyStatus.innerHTML = `Статус ключей: OK<br>
-                    n: <span class="big-number">${n.toString()}</span><br>
-                    max_i: ${max_i.toLocaleString()}`;
-                return true;
-            }
-            
-            // Функция шифрования
-            function encrypt(text) {
-                if (!initKeys()) return null;
-                
+            // Дешифрование массива омофонов
+            decryptHomophones(homophones, keyBytes) {
                 const result = [];
+                let keyIndex = 0;
                 
-                for (let idx = 0; idx < text.length; idx++) {
-                    const M = text.charCodeAt(idx);
-                    // Случайный выбор омофона
-                    const i = Math.floor(Math.random() * (max_i - 1000)) + 500;
+                for (let homophone of homophones) {
+                    // Получаем байт и индекс из омофона
+                    const { byte, index } = this.reverseMap.get(homophone);
                     
-                    // X = M + i * K
-                    const X = M + i * K;
-                    const X_big = BigInt(X);
+                    // Проверяем ключ
+                    const keyByte = keyBytes[keyIndex % keyBytes.length];
+                    const expectedIndex = (byte + keyByte) % 16;
                     
-                    if (X_big >= n) {
-                        outputResult.textContent = `Ошибка: X >= n`;
-                        return null;
+                    if (index === expectedIndex) {
+                        result.push(byte);
+                    } else {
+                        throw new Error(`Ошибка проверки ключа для омофона ${homophone}`);
                     }
                     
-                    // Шифрование: C = X^e mod n
-                    const C = modExp(X, E, n);
-                    
-                    result.push(C.toString());
+                    keyIndex++;
                 }
                 
-                return result.join(' ');
+                return result;
             }
             
-            // Функция дешифрования
-            function decrypt(cipherText) {
-                if (!initKeys()) return null;
-                
-                const cipherArray = cipherText.split(' ').filter(x => x !== '');
-                const result = [];
-                
-                for (const cipherNum of cipherArray) {
-                    const C = BigInt(cipherNum);
-                    
-                    if (C >= n) {
-                        outputResult.textContent = `Ошибка: C >= n`;
-                        return null;
-                    }
-                    
-                    // Дешифрование: X = C^d mod n
-                    const X = modExp(C, d, n);
-                    const X_num = Number(X);
-                    
-                    // M = X mod K
-                    const M = X_num % K;
-                    
-                    if (M < 0 || M > 255) {
-                        outputResult.textContent = `Ошибка дешифрования: M=${M}`;
-                        return null;
-                    }
-                    
-                    result.push(String.fromCharCode(M));
+            // Преобразование hex-строки в массив байтов
+            hexToBytes(hex) {
+                const bytes = [];
+                for (let i = 0; i < hex.length; i += 2) {
+                    bytes.push(parseInt(hex.substr(i, 2), 16));
                 }
-                
-                return result.join('');
+                return bytes;
             }
             
-            // Обработчики событий
-            generateKeysBtn.addEventListener('click', function() {
-                primePInput.value = BIG_PRIMES[0];
-                primeQInput.value = BIG_PRIMES[1];
+            // Преобразование массива байтов в hex-строку
+            bytesToHex(bytes) {
+                return bytes.map(b => b.toString(16).padStart(2, '0')).join('');
+            }
+            
+            // Получение всех точек для визуализации
+            getAllPoints() {
+                const points = [];
+                for (let x = 0; x < this.cubeSize; x++) {
+                    for (let y = 0; y < this.cubeSize; y++) {
+                        for (let z = 0; z < this.cubeSize; z++) {
+                            points.push({x, y, z});
+                        }
+                    }
+                }
+                return points;
+            }
+            
+            // Получение точек для конкретного байта
+            getPointsForByte(byte) {
+                const points = [];
+                const homophones = this.homophoneMap.get(byte) || [];
                 
-                if (initKeys()) {
-                    outputResult.textContent = 'Большие ключи установлены!';
-                }
-            });
-            
-            encryptBtn.addEventListener('click', function() {
-                const text = inputText.value;
-                if (!text) {
-                    outputResult.textContent = 'Введите текст для шифрования';
-                    return;
+                for (let homophone of homophones) {
+                    const val = homophone - 1;
+                    const x = Math.floor(val / 256);
+                    const y = Math.floor((val % 256) / 16);
+                    const z = val % 16;
+                    points.push({x, y, z});
                 }
                 
-                const encrypted = encrypt(text);
-                if (encrypted) {
-                    outputResult.textContent = encrypted;
-                }
-            });
+                return points;
+            }
+        }
+
+        // 3D визуализация
+        class CubeVisualization {
+            constructor(containerId) {
+                this.container = document.getElementById(containerId);
+                this.scene = new THREE.Scene();
+                this.camera = new THREE.PerspectiveCamera(75, this.container.clientWidth / this.container.clientHeight, 0.1, 1000);
+                this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+                this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
+                this.container.appendChild(this.renderer.domElement);
+                
+                this.points = [];
+                this.pointGroup = new THREE.Group();
+                this.scene.add(this.pointGroup);
+                
+                // Добавляем освещение
+                const ambientLight = new THREE.AmbientLight(0x404040);
+                this.scene.add(ambientLight);
+                
+                const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+                directionalLight.position.set(1, 1, 1);
+                this.scene.add(directionalLight);
+                
+                // Добавляем каркас куба
+                const geometry = new THREE.BoxGeometry(16, 16, 16);
+                const edges = new THREE.EdgesGeometry(geometry);
+                const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x64ffda }));
+                this.scene.add(line);
+                
+                // Позиционируем камеру
+                this.camera.position.z = 30;
+                this.camera.position.y = 15;
+                this.camera.lookAt(0, 0, 0);
+                
+                // Добавляем оси
+                this.addAxes();
+                
+                // Обработка изменения размера окна
+                window.addEventListener('resize', () => this.onWindowResize());
+                
+                // Запускаем анимацию
+                this.animate();
+            }
             
-            decryptBtn.addEventListener('click', function() {
-                const text = inputText.value;
-                if (!text) {
-                    outputResult.textContent = 'Введите текст для расшифрования';
-                    return;
+            addAxes() {
+                // Ось X (красная)
+                const xGeometry = new THREE.BufferGeometry().setFromPoints([
+                    new THREE.Vector3(-8, 0, 0),
+                    new THREE.Vector3(8, 0, 0)
+                ]);
+                const xMaterial = new THREE.LineBasicMaterial({ color: 0xff5555 });
+                const xAxis = new THREE.Line(xGeometry, xMaterial);
+                this.scene.add(xAxis);
+                
+                // Ось Y (зеленая)
+                const yGeometry = new THREE.BufferGeometry().setFromPoints([
+                    new THREE.Vector3(0, -8, 0),
+                    new THREE.Vector3(0, 8, 0)
+                ]);
+                const yMaterial = new THREE.LineBasicMaterial({ color: 0x55ff55 });
+                const yAxis = new THREE.Line(yGeometry, yMaterial);
+                this.scene.add(yAxis);
+                
+                // Ось Z (синяя)
+                const zGeometry = new THREE.BufferGeometry().setFromPoints([
+                    new THREE.Vector3(0, 0, -8),
+                    new THREE.Vector3(0, 0, 8)
+                ]);
+                const zMaterial = new THREE.LineBasicMaterial({ color: 0x5555ff });
+                const zAxis = new THREE.Line(zGeometry, zMaterial);
+                this.scene.add(zAxis);
+            }
+            
+            addPoints(points, color = 0x64ffda) {
+                // Очищаем существующие точки
+                this.pointGroup.clear();
+                
+                // Добавляем новые точки
+                const geometry = new THREE.BufferGeometry();
+                const positions = [];
+                const colors = [];
+                
+                for (const point of points) {
+                    // Преобразуем из диапазона [0,15] в [-8,7] для центрирования
+                    positions.push(point.x - 8, point.y - 8, point.z - 8);
+                    
+                    // Добавляем вариацию цвета на основе позиции
+                    colors.push(
+                        (point.x / 16) * 0.8 + 0.2,
+                        (point.y / 16) * 0.8 + 0.2,
+                        (point.z / 16) * 0.8 + 0.2
+                    );
                 }
                 
-                const decrypted = decrypt(text);
-                if (decrypted) {
-                    outputResult.textContent = 'Расшифрованный текст: ' + decrypted;
+                geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+                geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+                
+                const material = new THREE.PointsMaterial({
+                    size: 0.7,
+                    vertexColors: true,
+                    sizeAttenuation: false
+                });
+                
+                const pointCloud = new THREE.Points(geometry, material);
+                this.pointGroup.add(pointCloud);
+                
+                // Обновляем статистику
+                document.getElementById('pointCount').textContent = points.length;
+            }
+            
+            onWindowResize() {
+                this.camera.aspect = this.container.clientWidth / this.container.clientHeight;
+                this.camera.updateProjectionMatrix();
+                this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
+            }
+            
+            animate() {
+                requestAnimationFrame(() => this.animate());
+                
+                // Вращаем группу точек
+                this.pointGroup.rotation.x += 0.005;
+                this.pointGroup.rotation.y += 0.007;
+                
+                this.renderer.render(this.scene, this.camera);
+            }
+        }
+
+        // Инициализация приложения
+        document.addEventListener('DOMContentLoaded', () => {
+            const cipher = new HomophonicCipher3D();
+            const visualization = new CubeVisualization('cube-container');
+            
+            // Показываем все точки при запуске
+            visualization.addPoints(cipher.getAllPoints());
+            
+            // Настройка обработчиков событий
+            document.getElementById('encryptBtn').addEventListener('click', () => {
+                const text = document.getElementById('plainText').value;
+                const key = document.getElementById('key').value;
+                
+                if (text && key) {
+                    try {
+                        const bytes = cipher.hexToBytes(text);
+                        const keyBytes = cipher.hexToBytes(key);
+                        
+                        const homophones = cipher.encryptBytes(bytes, keyBytes);
+                        document.getElementById('cipherResult').textContent = homophones.map(h => h.toString(16).padStart(4, '0')).join(' ');
+                        
+                        // Визуализируем точки для первого байта
+                        if (bytes.length > 0) {
+                            const points = cipher.getPointsForByte(bytes[0]);
+                            visualization.addPoints(points);
+                        }
+                        
+                        document.getElementById('byteCount').textContent = bytes.length;
+                    } catch (e) {
+                        document.getElementById('cipherResult').textContent = 'Ошибка: ' + e.message;
+                    }
                 }
             });
             
-            clearBtn.addEventListener('click', function() {
-                inputText.value = '';
-                outputResult.textContent = 'Здесь будет результат...';
+            document.getElementById('decryptBtn').addEventListener('click', () => {
+                const text = document.getElementById('cipherText').value;
+                const key = document.getElementById('decryptKey').value;
+                
+                if (text && key) {
+                    try {
+                        const homophones = text.split(' ').map(h => parseInt(h, 16));
+                        const keyBytes = cipher.hexToBytes(key);
+                        
+                        const bytes = cipher.decryptHomophones(homophones, keyBytes);
+                        document.getElementById('decryptResult').textContent = cipher.bytesToHex(bytes);
+                    } catch (e) {
+                        document.getElementById('decryptResult').textContent = 'Ошибка: ' + e.message;
+                    }
+                }
             });
-            
-            // Инициализация при загрузке
-            initKeys();
         });
     </script>
 </body>
