@@ -3,632 +3,247 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PROFESSIONAL BYTE TRIFID 16x16x16</title>
+    <title>TRUE TRIFID COORDINATE MAPPING</title>
     <style>
-        /* Стили остаются без изменений */
-        :root {
-            --primary: #0f0c29;
-            --secondary: #302b63;
-            --accent: #24243e;
-            --text: #00ffcc;
-            --highlight: #ff00ff;
-            --border: #00ffcc;
-            --error: #ff4444;
-            --success: #00ff88;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Courier New', Monaco, monospace;
-        }
-        
-        body {
-            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
-            color: var(--text);
-            min-height: 100vh;
-            padding: 20px;
-            line-height: 1.6;
-        }
-        
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 30px;
-            border: 3px solid var(--border);
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: 15px;
-            box-shadow: 0 0 30px rgba(0, 255, 204, 0.2);
-        }
-        
-        h1 {
-            font-size: 2.8em;
-            margin-bottom: 15px;
-            text-shadow: 0 0 15px var(--text), 0 0 25px var(--text);
-            letter-spacing: 2px;
-        }
-        
-        .subtitle {
-            color: var(--highlight);
-            font-size: 1.3em;
-            font-weight: bold;
-        }
-        
-        .crypto-section {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 25px;
-            margin-bottom: 35px;
-        }
-        
-        @media (max-width: 1024px) {
-            .crypto-section {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        .panel {
-            background: rgba(0, 0, 0, 0.8);
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 0 25px rgba(0, 255, 204, 0.25);
-        }
-        
-        h2 {
-            color: var(--highlight);
-            margin-bottom: 20px;
-            border-bottom: 2px solid var(--border);
-            padding-bottom: 8px;
-            font-size: 1.5em;
-        }
-        
-        .input-group {
-            margin-bottom: 20px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: var(--text);
-            font-weight: bold;
-            font-size: 14px;
-        }
-        
-        input, textarea, select {
-            width: 100%;
-            padding: 14px;
-            background: rgba(0, 0, 0, 0.6);
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            color: var(--text);
-            font-size: 15px;
-            font-family: 'Courier New', monospace;
-        }
-        
-        textarea {
-            min-height: 120px;
-            resize: vertical;
-        }
-        
-        .btn-group {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin: 15px 0;
-        }
-        
-        button {
-            background: linear-gradient(45deg, var(--highlight), var(--text));
-            color: #000;
-            border: none;
-            padding: 16px 28px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 15px;
-            transition: all 0.3s ease;
-            flex: 1;
-            min-width: 140px;
-        }
-        
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 0 25px rgba(255, 0, 255, 0.4);
-        }
-        
-        button:active {
-            transform: translateY(0);
-        }
-        
-        .result-area {
-            margin-top: 25px;
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.6);
-            border: 2px solid var(--highlight);
-            border-radius: 10px;
-            min-height: 150px;
-        }
-        
-        .hex-view {
-            font-family: 'Courier New', monospace;
-            white-space: pre-wrap;
-            word-break: break-all;
-            font-size: 14px;
-            line-height: 1.8;
-        }
-        
-        .status {
-            padding: 12px;
-            margin: 12px 0;
-            border-radius: 6px;
-            text-align: center;
-            font-weight: bold;
-            border: 1px solid;
-        }
-        
-        .status.success {
-            background: rgba(0, 255, 136, 0.1);
-            color: var(--success);
-            border-color: var(--success);
-        }
-        
-        .status.error {
-            background: rgba(255, 68, 68, 0.1);
-            color: var(--error);
-            border-color: var(--error);
-        }
-        
-        .cube-display {
-            margin-top: 25px;
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.7);
-            border: 2px solid var(--border);
-            border-radius: 10px;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        
-        .cube-header {
-            color: var(--highlight);
-            margin-bottom: 15px;
-            font-weight: bold;
-        }
-        
-        .cube-grid {
-            display: grid;
-            grid-template-columns: repeat(16, 1fr);
-            gap: 1px;
-            font-size: 9px;
-        }
-        
-        .cube-cell {
-            padding: 4px 2px;
-            text-align: center;
-            background: rgba(0, 255, 204, 0.08);
-            border: 1px solid rgba(0, 255, 204, 0.2);
-            font-weight: 500;
-        }
-        
-        .cube-cell:hover {
-            background: rgba(0, 255, 204, 0.2);
-            transform: scale(1.05);
-        }
-        
-        .specs {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-top: 25px;
-        }
-        
-        .spec-item {
-            padding: 15px;
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-        }
-        
-        .spec-item h3 {
-            color: var(--highlight);
-            margin-bottom: 10px;
-            font-size: 16px;
-        }
-        
-        .loader {
-            border: 3px solid rgba(0, 255, 204, 0.3);
-            border-top: 3px solid var(--text);
-            border-radius: 50%;
-            width: 25px;
-            height: 25px;
-            animation: spin 1s linear infinite;
-            display: inline-block;
-            margin-right: 10px;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .coordinates {
-            font-size: 11px;
-            color: var(--highlight);
-            margin-top: 3px;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Courier New', monospace; }
+        body { background: #000; color: #0f0; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        header { text-align: center; margin-bottom: 20px; padding: 15px; border-bottom: 2px solid #0f0; }
+        h1 { font-size: 24px; margin-bottom: 10px; }
+        .panel { background: #111; border: 1px solid #0f0; padding: 15px; margin-bottom: 15px; }
+        h2 { color: #f0f; margin-bottom: 10px; }
+        .input-group { margin-bottom: 10px; }
+        label { display: block; margin-bottom: 5px; color: #0f0; }
+        input, textarea { width: 100%; padding: 8px; background: #222; border: 1px solid #0f0; color: #0f0; }
+        textarea { height: 60px; }
+        button { background: #f0f; color: #000; border: none; padding: 8px 15px; margin: 5px; cursor: pointer; font-weight: bold; }
+        .result { margin-top: 10px; padding: 10px; background: #222; border: 1px solid #f0f; }
+        .hex { font-family: 'Courier New', monospace; white-space: pre-wrap; word-break: break-all; font-size: 12px; }
+        .coords-log { margin-top: 15px; padding: 10px; background: #222; border: 1px solid #0f0; font-size: 11px; }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>PROFESSIONAL BYTE TRIFID CIPHER</h1>
-            <div class="subtitle">16×16×16 MILITARY-GRADE CRYPTOGRAPHIC SYSTEM</div>
+            <h1>TRUE TRIFID COORDINATE MAPPING</h1>
+            <div>Original Trifid Algorithm - Coordinate → Number Mapping</div>
         </header>
 
-        <div class="crypto-section">
-            <div class="panel">
-                <h2>KEY MANAGEMENT</h2>
-                <div class="input-group">
-                    <label for="cryptoKey">CRYPTOGRAPHIC KEY (256-bit recommended):</label>
-                    <input type="password" id="cryptoKey" placeholder="Enter master encryption key..." 
-                           value="TRIFID_16x16x16_SECURE_KEY_256BIT">
-                </div>
-                
-                <div class="input-group">
-                    <label for="keyIterations">KEY STRETCHING ITERATIONS:</label>
-                    <input type="number" id="keyIterations" value="100000" min="1000" max="1000000">
-                </div>
-                
-                <div class="btn-group">
-                    <button onclick="initializeCipher()">INITIALIZE CIPHER</button>
-                    <button onclick="generateRandomKey()">GENERATE RANDOM KEY</button>
-                    <button onclick="exportKeyMaterial()">EXPORT KEY MATERIAL</button>
-                </div>
-                
-                <div id="keyStatus" class="status"></div>
-            </div>
-
-            <div class="panel">
-                <h2>CRYPTO OPERATIONS</h2>
-                <div class="input-group">
-                    <label for="inputData">INPUT DATA (HEX/TEXT):</label>
-                    <textarea id="inputData" placeholder="Enter data for processing..."></textarea>
-                </div>
-                
-                <div class="input-group">
-                    <label for="operationMode">OPERATION MODE:</label>
-                    <select id="operationMode">
-                        <option value="encrypt">ENCRYPTION</option>
-                        <option value="decrypt">DECRYPTION</option>
-                    </select>
-                </div>
-
-                <div class="btn-group">
-                    <button onclick="executeCryptoOperation()">EXECUTE OPERATION</button>
-                    <button onclick="clearResults()">CLEAR RESULTS</button>
-                    <button onclick="performBenchmark()">RUN BENCHMARK</button>
-                </div>
-                
-                <div class="result-area">
-                    <strong>OUTPUT:</strong>
-                    <div id="outputResult" class="hex-view"></div>
-                </div>
-            </div>
-        </div>
-
         <div class="panel">
-            <h2>CUBE VISUALIZATION - LAYER 0</h2>
-            <div class="cube-display">
-                <div class="cube-header">16×16 CUBE LAYER (0-255 VALUES)</div>
-                <div class="cube-grid" id="cubeVisualization"></div>
+            <h2>TRIFID PROCESS WITH CORRECT MAPPING</h2>
+            <div class="input-group">
+                <label>Input Bytes (Hex):</label>
+                <textarea id="inputText">010203040506</textarea>
             </div>
-        </div>
+            
+            <button onclick="processTrueTrifid()">Run True Trifid</button>
+            
+            <div class="result">
+                <strong>Result:</strong>
+                <div id="output" class="hex"></div>
+            </div>
 
-        <div class="panel">
-            <h2>SYSTEM SPECIFICATIONS</h2>
-            <div class="specs">
-                <div class="spec-item">
-                    <h3>ARCHITECTURE</h3>
-                    <p>16 independent cubes × 16 rows × 16 columns</p>
-                    <p>4096 unique coordinate positions</p>
-                    <p>3D coordinate transformation system</p>
-                </div>
-                
-                <div class="spec-item">
-                    <h3>CRYPTOGRAPHIC PROPERTIES</h3>
-                    <p>Key space: 4096! permutations</p>
-                    <p>256-bit secure key derivation</p>
-                    <p>Military-grade transformation</p>
-                </div>
-                
-                <div class="spec-item">
-                    <h3>PERFORMANCE</h3>
-                    <p>Real-time byte processing</p>
-                    <p>Low memory footprint</p>
-                    <p>High-speed coordinate mapping</p>
-                </div>
+            <div class="coords-log">
+                <strong>Coordinate Mapping Log:</strong>
+                <div id="coordLog" class="hex"></div>
             </div>
         </div>
     </div>
 
     <script>
-        class ProfessionalByteTrifid {
+        class TrueTrifid {
             constructor() {
-                this.cube = null;
-                this.positionMap = new Map();
-                this.initialized = false;
-                this.keyMaterial = null;
+                // Create 16x16x16 cube with random numbers 0-4095
+                this.cube = this.createRandomCube();
             }
 
-            async initializeWithKey(keyString, iterations = 100000) {
-                try {
-                    this.showStatus("Deriving key material...", "status");
-                    
-                    // Generate cryptographically strong key material
-                    this.keyMaterial = await this.deriveKey(keyString, iterations);
-                    
-                    // Initialize 16x16x16 cube structure
-                    this.cube = new Array(16);
-                    for (let k = 0; k < 16; k++) {
-                        this.cube[k] = new Array(16);
-                        for (let i = 0; i < 16; i++) {
-                            this.cube[k][i] = new Array(16).fill(0);
+            createRandomCube() {
+                // Create cube with random permutation
+                const numbers = Array.from({length: 4096}, (_, i) => i);
+                this.shuffle(numbers);
+                
+                const cube = new Array(16);
+                let index = 0;
+                
+                for (let k = 0; k < 16; k++) {
+                    cube[k] = new Array(16);
+                    for (let i = 0; i < 16; i++) {
+                        cube[k][i] = new Array(16);
+                        for (let j = 0; j < 16; j++) {
+                            cube[k][i][j] = numbers[index++];
                         }
                     }
+                }
+                
+                return cube;
+            }
 
-                    // Create and shuffle numbers 0-4095
-                    const numbers = Array.from({length: 4096}, (_, i) => i);
-                    await this.cryptographicShuffle(numbers, this.keyMaterial);
+            shuffle(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+            }
 
-                    // Fill cube with shuffled numbers
-                    let index = 0;
-                    for (let k = 0; k < 16; k++) {
-                        for (let i = 0; i < 16; i++) {
-                            for (let j = 0; j < 16; j++) {
-                                const value = numbers[index++];
-                                this.cube[k][i][j] = value;
-                                this.positionMap.set(value, [k, i, j]);
+            findCoordinates(number) {
+                // Find coordinates for given number in cube
+                for (let k = 0; k < 16; k++) {
+                    for (let i = 0; i < 16; i++) {
+                        for (let j = 0; j < 16; j++) {
+                            if (this.cube[k][i][j] === number) {
+                                return [k, i, j];
                             }
                         }
                     }
-
-                    this.initialized = true;
-                    this.showStatus("Cipher initialized successfully", "success");
-                    this.visualizeCube();
-                    return true;
-
-                } catch (error) {
-                    this.showStatus("Initialization failed: " + error.message, "error");
-                    return false;
                 }
+                return null;
             }
 
-            async deriveKey(keyString, iterations) {
-                const encoder = new TextEncoder();
-                const keyMaterial = encoder.encode(keyString);
+            processTrueTrifid(hexData) {
+                const bytes = this.hexToBytes(hexData);
+                let log = "=== TRUE TRIFID COORDINATE MAPPING ===\n\n";
                 
-                // Use Web Crypto API for key derivation
-                const importedKey = await crypto.subtle.importKey(
-                    'raw',
-                    keyMaterial,
-                    {name: 'PBKDF2'},
-                    false,
-                    ['deriveBits']
-                );
-
-                const salt = new Uint8Array(16); // Zero salt for deterministic output
-                const derivedBits = await crypto.subtle.deriveBits(
-                    {
-                        name: 'PBKDF2',
-                        salt: salt,
-                        iterations: iterations,
-                        hash: 'SHA-256'
-                    },
-                    importedKey,
-                    256
-                );
-
-                return new Uint8Array(derivedBits);
-            }
-
-            async cryptographicShuffle(array, keyMaterial) {
-                // Use CSPRNG for shuffling
-                for (let i = array.length - 1; i > 0; i--) {
-                    const randomIndex = await this.getSecureRandomIndex(i, keyMaterial);
-                    [array[i], array[randomIndex]] = [array[randomIndex], array[i]];
-                }
-            }
-
-            async getSecureRandomIndex(max, keyMaterial) {
-                const randomValue = new Uint32Array(1);
-                crypto.getRandomValues(randomValue);
-                return randomValue[0] % (max + 1);
-            }
-
-            encrypt(data) {
-                if (!this.initialized) throw new Error("Cipher not initialized");
-
-                const bytes = this.stringToBytes(data);
-                const coords = {k: [], x: [], y: []};
+                // 1. FIND COORDINATES FOR EACH BYTE
+                log += "1. FIND COORDINATES IN CUBE:\n";
+                const coords = { k: [], x: [], y: [] };
                 
-                // Get coordinates for each byte
-                for (const byte of bytes) {
-                    const [k, x, y] = this.positionMap.get(byte);
+                for (let i = 0; i < bytes.length; i++) {
+                    const byte = bytes[i];
+                    const [k, x, y] = this.findCoordinates(byte);
+                    
                     coords.k.push(k);
                     coords.x.push(x);
                     coords.y.push(y);
+                    
+                    log += `Byte ${byte.toString(16).padStart(2, '0')} → (${k},${x},${y})\n`;
                 }
+                
+                log += `\nK coordinates: ${coords.k.join(',')}\n`;
+                log += `X coordinates: ${coords.x.join(',')}\n`;
+                log += `Y coordinates: ${coords.y.join(',')}\n\n`;
 
-                // Trifid transformation - группируем координаты
-                const allCoords = [...coords.k, ...coords.x, ...coords.y];
-                const result = [];
+                // 2. COMBINE COORDINATE SEQUENCES (TRUE TRIFID STEP)
+                log += "2. COMBINE COORDINATE SEQUENCES:\n";
+                const combined = [...coords.k, ...coords.x, ...coords.y];
+                log += `Combined: ${combined.join(',')}\n\n`;
 
-                // Преобразуем координаты обратно в байты
-                for (let i = 0; i < allCoords.length; i += 3) {
-                    if (i + 2 < allCoords.length) {
-                        const k = allCoords[i];
-                        const x = allCoords[i + 1];
-                        const y = allCoords[i + 2];
-                        result.push(this.cube[k][x][y]);
+                // 3. GROUP INTO NEW COORDINATE TRIPLES
+                log += "3. CREATE NEW COORDINATE TRIPLES:\n";
+                const newCoords = [];
+                for (let i = 0; i < combined.length; i += 3) {
+                    if (i + 2 < combined.length) {
+                        const newK = combined[i];
+                        const newX = combined[i + 1];
+                        const newY = combined[i + 2];
+                        newCoords.push([newK, newX, newY]);
+                        log += `New coordinate triple: (${newK},${newX},${newY})\n`;
                     }
                 }
+                log += '\n';
 
-                return this.bytesToHex(new Uint8Array(result));
-            }
-
-            decrypt(hexData) {
-                if (!this.initialized) throw new Error("Cipher not initialized");
-
-                const bytes = this.hexToBytes(hexData);
-                const coords = {k: [], x: [], y: []};
-
-                // Get coordinates for each encrypted byte
-                for (const byte of bytes) {
-                    const [k, x, y] = this.positionMap.get(byte);
-                    coords.k.push(k);
-                    coords.x.push(x);
-                    coords.y.push(y);
-                }
-
-                // Reverse Trifid transformation
-                const totalCoords = coords.k.length;
-                const allCoords = [...coords.k, ...coords.x, ...coords.y];
+                // 4. MAP NEW COORDINATES TO NUMBERS IN CUBE
+                log += "4. MAP NEW COORDINATES TO NUMBERS:\n";
                 const result = [];
-
-                // Восстанавливаем исходные координаты
-                for (let i = 0; i < totalCoords; i++) {
-                    const k = allCoords[i];
-                    const x = allCoords[i + totalCoords];
-                    const y = allCoords[i + 2 * totalCoords];
-                    result.push(this.cube[k][x][y]);
+                for (let i = 0; i < newCoords.length; i++) {
+                    const [k, x, y] = newCoords[i];
+                    const newNumber = this.cube[k][x][y];
+                    result.push(newNumber);
+                    log += `Coordinates (${k},${x},${y}) → Number ${newNumber.toString(16).padStart(3, '0')}\n`;
                 }
 
-                return this.bytesToString(new Uint8Array(result));
+                return {
+                    result: this.bytesToHex(new Uint8Array(result)),
+                    log: log
+                };
             }
 
-            stringToBytes(str) {
-                return new TextEncoder().encode(str);
-            }
+            reverseTrueTrifid(hexData) {
+                const bytes = this.hexToBytes(hexData);
+                let log = "=== REVERSE TRIFID MAPPING ===\n\n";
+                
+                // 1. FIND COORDINATES FOR ENCRYPTED BYTES
+                log += "1. FIND COORDINATES FOR ENCRYPTED BYTES:\n";
+                const encryptedCoords = { k: [], x: [], y: [] };
+                
+                for (let i = 0; i < bytes.length; i++) {
+                    const byte = bytes[i];
+                    const [k, x, y] = this.findCoordinates(byte);
+                    
+                    encryptedCoords.k.push(k);
+                    encryptedCoords.x.push(x);
+                    encryptedCoords.y.push(y);
+                    
+                    log += `Encrypted ${byte.toString(16).padStart(3, '0')} → (${k},${x},${y})\n`;
+                }
+                
+                log += `\nK: ${encryptedCoords.k.join(',')}\n`;
+                log += `X: ${encryptedCoords.x.join(',')}\n`;
+                log += `Y: ${encryptedCoords.y.join(',')}\n\n`;
 
-            bytesToString(bytes) {
-                return new TextDecoder().decode(bytes);
-            }
+                // 2. RECONSTRUCT COMBINED COORDINATE SEQUENCE
+                log += "2. RECONSTRUCT COMBINED SEQUENCE:\n";
+                const total = encryptedCoords.k.length;
+                const combined = [];
+                
+                for (let i = 0; i < total * 3; i++) {
+                    if (i < total) combined.push(encryptedCoords.k[i]);
+                    else if (i < total * 2) combined.push(encryptedCoords.x[i - total]);
+                    else combined.push(encryptedCoords.y[i - total * 2]);
+                }
+                
+                log += `Reconstructed: ${combined.join(',')}\n\n`;
 
-            bytesToHex(bytes) {
-                return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+                // 3. EXTRACT ORIGINAL COORDINATE TRIPLES
+                log += "3. EXTRACT ORIGINAL COORDINATES:\n";
+                const originalCoords = [];
+                for (let i = 0; i < total; i++) {
+                    const k = combined[i];
+                    const x = combined[i + total];
+                    const y = combined[i + total * 2];
+                    originalCoords.push([k, x, y]);
+                    log += `Original coordinates: (${k},${x},${y})\n`;
+                }
+                log += '\n';
+
+                // 4. MAP ORIGINAL COORDINATES BACK TO NUMBERS
+                log += "4. MAP TO ORIGINAL NUMBERS:\n";
+                const result = [];
+                for (let i = 0; i < originalCoords.length; i++) {
+                    const [k, x, y] = originalCoords[i];
+                    const originalNumber = this.cube[k][x][y];
+                    result.push(originalNumber);
+                    log += `(${k},${x},${y}) → ${originalNumber.toString(16).padStart(2, '0')}\n`;
+                }
+
+                return {
+                    result: this.bytesToHex(new Uint8Array(result)),
+                    log: log
+                };
             }
 
             hexToBytes(hex) {
                 const bytes = [];
-                for (let i = 0; i < hex.length; i += 2) {
-                    bytes.push(parseInt(hex.substr(i, 2), 16));
+                const cleanHex = hex.replace(/[^0-9A-Fa-f]/g, '');
+                for (let i = 0; i < cleanHex.length; i += 2) {
+                    bytes.push(parseInt(cleanHex.substr(i, 2), 16));
                 }
-                return new Uint8Array(bytes);
+                return bytes;
             }
 
-            visualizeCube() {
-                const grid = document.getElementById('cubeVisualization');
-                grid.innerHTML = '';
-
-                if (!this.cube) return;
-
-                // Show first layer (cube 0)
-                for (let i = 0; i < 16; i++) {
-                    for (let j = 0; j < 16; j++) {
-                        const cell = document.createElement('div');
-                        cell.className = 'cube-cell';
-                        cell.textContent = this.cube[0][i][j].toString(16).padStart(3, '0');
-                        cell.title = `Cube: 0, Row: ${i}, Col: ${j}, Value: ${this.cube[0][i][j]}`;
-                        grid.appendChild(cell);
-                    }
-                }
-            }
-
-            showStatus(message, type) {
-                const statusEl = document.getElementById('keyStatus');
-                statusEl.textContent = message;
-                statusEl.className = `status ${type}`;
+            bytesToHex(bytes) {
+                return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join(' ');
             }
         }
 
-        // Global cipher instance
-        const trifidCipher = new ProfessionalByteTrifid();
+        const trueTrifid = new TrueTrifid();
 
-        async function initializeCipher() {
-            const key = document.getElementById('cryptoKey').value;
-            const iterations = parseInt(document.getElementById('keyIterations').value);
+        function processTrueTrifid() {
+            const input = document.getElementById('inputText').value;
+            const result = trueTrifid.processTrueTrifid(input);
             
-            if (!key) {
-                alert('Please enter a cryptographic key');
-                return;
-            }
-
-            await trifidCipher.initializeWithKey(key, iterations);
+            document.getElementById('output').textContent = result.result;
+            document.getElementById('coordLog').textContent = result.log;
         }
-
-        function generateRandomKey() {
-            const randomKey = crypto.randomUUID() + crypto.randomUUID();
-            document.getElementById('cryptoKey').value = randomKey;
-        }
-
-        function exportKeyMaterial() {
-            if (!trifidCipher.initialized) {
-                alert('Cipher not initialized');
-                return;
-            }
-            alert('Key material exported (simulated)');
-        }
-
-        function executeCryptoOperation() {
-            if (!trifidCipher.initialized) {
-                alert('Please initialize the cipher first');
-                return;
-            }
-
-            const input = document.getElementById('inputData').value;
-            const mode = document.getElementById('operationMode').value;
-            
-            if (!input) {
-                alert('Please enter input data');
-                return;
-            }
-
-            try {
-                let result;
-                if (mode === 'encrypt') {
-                    result = trifidCipher.encrypt(input);
-                } else {
-                    result = trifidCipher.decrypt(input);
-                }
-                
-                document.getElementById('outputResult').textContent = result;
-            } catch (error) {
-                alert('Error: ' + error.message);
-            }
-        }
-
-        function clearResults() {
-            document.getElementById('outputResult').textContent = '';
-            document.getElementById('inputData').value = '';
-        }
-
-        function performBenchmark() {
-            alert('Benchmark functionality not implemented in this version');
-        }
-
-        // Initialize with default key
-        window.onload = function() {
-            setTimeout(() => {
-                initializeCipher();
-            }, 1000);
-        };
     </script>
 </body>
 </html>
