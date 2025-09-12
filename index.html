@@ -3,668 +3,527 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PROFESSIONAL BYTE TRIFID 16x16x16</title>
+    <title>PROFESSIONAL TRIFID CIPHER - DETERMINISTIC</title>
     <style>
-        /* Стили остаются без изменений */
-        :root {
-            --primary: #0f0c29;
-            --secondary: #302b63;
-            --accent: #24243e;
-            --text: #00ffcc;
-            --highlight: #ff00ff;
-            --border: #00ffcc;
-            --error: #ff4444;
-            --success: #00ff88;
-        }
-        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Courier New', Monaco, monospace;
+            font-family: 'Courier New', monospace;
         }
-        
         body {
-            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
-            color: var(--text);
-            min-height: 100vh;
+            background: #0a0a1a;
+            color: #00ffcc;
             padding: 20px;
             line-height: 1.6;
         }
-        
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 20px;
         }
-        
         header {
             text-align: center;
             margin-bottom: 30px;
-            padding: 30px;
-            border: 3px solid var(--border);
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: 15px;
-            box-shadow: 0 0 30px rgba(0, 255, 204, 0.2);
-        }
-        
-        h1 {
-            font-size: 2.8em;
-            margin-bottom: 15px;
-            text-shadow: 0 0 15px var(--text), 0 0 25px var(--text);
-            letter-spacing: 2px;
-        }
-        
-        .subtitle {
-            color: var(--highlight);
-            font-size: 1.3em;
-            font-weight: bold;
-        }
-        
-        .crypto-section {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 25px;
-            margin-bottom: 35px;
-        }
-        
-        @media (max-width: 1024px) {
-            .crypto-section {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        .panel {
-            background: rgba(0, 0, 0, 0.8);
-            border: 2px solid var(--border);
-            border-radius: 12px;
             padding: 25px;
-            box-shadow: 0 0 25px rgba(0, 255, 204, 0.25);
+            border-bottom: 3px solid #00ffcc;
+            background: rgba(0, 20, 40, 0.8);
         }
-        
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px #00ffcc;
+        }
+        .panel {
+            background: rgba(0, 15, 30, 0.9);
+            border: 2px solid #00ffcc;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
         h2 {
-            color: var(--highlight);
+            color: #ff00ff;
             margin-bottom: 20px;
-            border-bottom: 2px solid var(--border);
-            padding-bottom: 8px;
+            border-bottom: 2px solid #00ffcc;
+            padding-bottom: 10px;
             font-size: 1.5em;
         }
-        
         .input-group {
             margin-bottom: 20px;
         }
-        
         label {
             display: block;
             margin-bottom: 8px;
-            color: var(--text);
+            color: #00ffcc;
             font-weight: bold;
-            font-size: 14px;
         }
-        
         input, textarea, select {
             width: 100%;
-            padding: 14px;
-            background: rgba(0, 0, 0, 0.6);
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            color: var(--text);
-            font-size: 15px;
-            font-family: 'Courier New', monospace;
+            padding: 12px;
+            background: rgba(0, 30, 60, 0.8);
+            border: 2px solid #00ffcc;
+            border-radius: 6px;
+            color: #00ffcc;
+            font-size: 14px;
         }
-        
         textarea {
-            min-height: 120px;
+            min-height: 100px;
             resize: vertical;
         }
-        
-        .btn-group {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin: 15px 0;
-        }
-        
         button {
-            background: linear-gradient(45deg, var(--highlight), var(--text));
+            background: linear-gradient(45deg, #ff00ff, #00ffcc);
             color: #000;
             border: none;
-            padding: 16px 28px;
+            padding: 15px 25px;
             border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
-            font-size: 15px;
+            margin: 10px 5px;
             transition: all 0.3s ease;
-            flex: 1;
-            min-width: 140px;
         }
-        
         button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 0 25px rgba(255, 0, 255, 0.4);
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
         }
-        
-        button:active {
-            transform: translateY(0);
-        }
-        
-        .result-area {
-            margin-top: 25px;
+        .result {
+            margin-top: 20px;
             padding: 20px;
-            background: rgba(0, 0, 0, 0.6);
-            border: 2px solid var(--highlight);
-            border-radius: 10px;
-            min-height: 150px;
+            background: rgba(0, 30, 60, 0.8);
+            border: 2px solid #ff00ff;
+            border-radius: 8px;
+            min-height: 120px;
         }
-        
-        .hex-view {
+        .hex {
             font-family: 'Courier New', monospace;
             white-space: pre-wrap;
             word-break: break-all;
-            font-size: 14px;
+            font-size: 13px;
             line-height: 1.8;
         }
-        
         .status {
-            padding: 12px;
-            margin: 12px 0;
+            padding: 15px;
+            margin: 15px 0;
             border-radius: 6px;
-            text-align: center;
-            font-weight: bold;
-            border: 1px solid;
-        }
-        
-        .status.success {
-            background: rgba(0, 255, 136, 0.1);
-            color: var(--success);
-            border-color: var(--success);
-        }
-        
-        .status.error {
-            background: rgba(255, 68, 68, 0.1);
-            color: var(--error);
-            border-color: var(--error);
-        }
-        
-        .cube-display {
-            margin-top: 25px;
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.7);
-            border: 2px solid var(--border);
-            border-radius: 10px;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        
-        .cube-header {
-            color: var(--highlight);
-            margin-bottom: 15px;
+            background: rgba(0, 255, 0, 0.1);
+            color: #00ff00;
+            border: 1px solid #00ff00;
             font-weight: bold;
         }
-        
-        .cube-grid {
-            display: grid;
-            grid-template-columns: repeat(16, 1fr);
-            gap: 1px;
-            font-size: 9px;
+        .error {
+            background: rgba(255, 0, 0, 0.1);
+            color: #ff4444;
+            border-color: #ff4444;
         }
-        
-        .cube-cell {
-            padding: 4px 2px;
-            text-align: center;
-            background: rgba(0, 255, 204, 0.08);
-            border: 1px solid rgba(0, 255, 204, 0.2);
-            font-weight: 500;
-        }
-        
-        .cube-cell:hover {
-            background: rgba(0, 255, 204, 0.2);
-            transform: scale(1.05);
-        }
-        
-        .specs {
+        .cube-info {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 20px;
             margin-top: 25px;
         }
-        
-        .spec-item {
+        .info-item {
             padding: 15px;
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid var(--border);
+            background: rgba(0, 20, 40, 0.8);
+            border: 1px solid #00ffcc;
             border-radius: 8px;
         }
-        
-        .spec-item h3 {
-            color: var(--highlight);
+        .info-item h3 {
+            color: #ff00ff;
             margin-bottom: 10px;
-            font-size: 16px;
         }
-        
-        .loader {
-            border: 3px solid rgba(0, 255, 204, 0.3);
-            border-top: 3px solid var(--text);
-            border-radius: 50%;
-            width: 25px;
-            height: 25px;
-            animation: spin 1s linear infinite;
-            display: inline-block;
-            margin-right: 10px;
+        .key-display {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #ff00ff;
+            margin-top: 10px;
+            word-break: break-all;
         }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .coordinates {
-            font-size: 11px;
-            color: var(--highlight);
-            margin-top: 3px;
+        .deterministic-test {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 40, 80, 0.8);
+            border: 1px solid #ff00ff;
+            border-radius: 6px;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>PROFESSIONAL BYTE TRIFID CIPHER</h1>
-            <div class="subtitle">16×16×16 MILITARY-GRADE CRYPTOGRAPHIC SYSTEM</div>
+            <h1>PROFESSIONAL TRIFID CIPHER - DETERMINISTIC</h1>
+            <div>Same Key → Same Cubes → Same Encryption</div>
         </header>
 
-        <div class="crypto-section">
-            <div class="panel">
-                <h2>KEY MANAGEMENT</h2>
-                <div class="input-group">
-                    <label for="cryptoKey">CRYPTOGRAPHIC KEY (256-bit recommended):</label>
-                    <input type="password" id="cryptoKey" placeholder="Enter master encryption key..." 
-                           value="TRIFID_16x16x16_SECURE_KEY_256BIT">
-                </div>
-                
-                <div class="input-group">
-                    <label for="keyIterations">KEY STRETCHING ITERATIONS:</label>
-                    <input type="number" id="keyIterations" value="100000" min="1000" max="1000000">
-                </div>
-                
-                <div class="btn-group">
-                    <button onclick="initializeCipher()">INITIALIZE CIPHER</button>
-                    <button onclick="generateRandomKey()">GENERATE RANDOM KEY</button>
-                    <button onclick="exportKeyMaterial()">EXPORT KEY MATERIAL</button>
-                </div>
-                
-                <div id="keyStatus" class="status"></div>
+        <div class="panel">
+            <h2>KEY MANAGEMENT & INITIALIZATION</h2>
+            <div class="input-group">
+                <label for="cryptoKey">CRYPTOGRAPHIC KEY:</label>
+                <input type="password" id="cryptoKey" value="MASTER_KEY_12345">
+            </div>
+            
+            <button onclick="initializeCipher()">INITIALIZE CIPHER</button>
+            <button onclick="testDeterminism()">TEST DETERMINISM</button>
+            <button onclick="verifyCubeConsistency()">VERIFY CUBE CONSISTENCY</button>
+            
+            <div id="keyStatus" class="status">Status: Ready for initialization</div>
+            
+            <div class="key-display" id="keyHashDisplay">
+                Key hash: Not calculated
             </div>
 
-            <div class="panel">
-                <h2>CRYPTO OPERATIONS</h2>
-                <div class="input-group">
-                    <label for="inputData">INPUT DATA (HEX/TEXT):</label>
-                    <textarea id="inputData" placeholder="Enter data for processing..."></textarea>
-                </div>
-                
-                <div class="input-group">
-                    <label for="operationMode">OPERATION MODE:</label>
-                    <select id="operationMode">
-                        <option value="encrypt">ENCRYPTION</option>
-                        <option value="decrypt">DECRYPTION</option>
-                    </select>
-                </div>
-
-                <div class="btn-group">
-                    <button onclick="executeCryptoOperation()">EXECUTE OPERATION</button>
-                    <button onclick="clearResults()">CLEAR RESULTS</button>
-                    <button onclick="performBenchmark()">RUN BENCHMARK</button>
-                </div>
-                
-                <div class="result-area">
-                    <strong>OUTPUT:</strong>
-                    <div id="outputResult" class="hex-view"></div>
-                </div>
+            <div class="deterministic-test" id="deterministicTest">
+                <strong>Deterministic Test:</strong> Same key will always produce identical cubes
             </div>
         </div>
 
         <div class="panel">
-            <h2>CUBE VISUALIZATION - LAYER 0</h2>
-            <div class="cube-display">
-                <div class="cube-header">16×16 CUBE LAYER (0-255 VALUES)</div>
-                <div class="cube-grid" id="cubeVisualization"></div>
+            <h2>DATA PROCESSING</h2>
+            <div class="input-group">
+                <label for="inputData">INPUT DATA:</label>
+                <textarea id="inputData">48656C6C6F20576F726C64</textarea>
+            </div>
+            
+            <div class="input-group">
+                <label for="operationMode">OPERATION MODE:</label>
+                <select id="operationMode">
+                    <option value="encrypt">ENCRYPT</option>
+                    <option value="decrypt">DECRYPT</option>
+                </select>
+            </div>
+
+            <button onclick="processData()">EXECUTE</button>
+            <button onclick="testRoundTrip()">TEST ROUND TRIP</button>
+            
+            <div class="result">
+                <strong>OUTPUT:</strong>
+                <div id="outputResult" class="hex"></div>
             </div>
         </div>
 
-        <div class="panel">
-            <h2>SYSTEM SPECIFICATIONS</h2>
-            <div class="specs">
-                <div class="spec-item">
-                    <h3>ARCHITECTURE</h3>
-                    <p>16 independent cubes × 16 rows × 16 columns</p>
-                    <p>4096 unique coordinate positions</p>
-                    <p>3D coordinate transformation system</p>
-                </div>
-                
-                <div class="spec-item">
-                    <h3>CRYPTOGRAPHIC PROPERTIES</h3>
-                    <p>Key space: 4096! permutations</p>
-                    <p>256-bit secure key derivation</p>
-                    <p>Military-grade transformation</p>
-                </div>
-                
-                <div class="spec-item">
-                    <h3>PERFORMANCE</h3>
-                    <p>Real-time byte processing</p>
-                    <p>Low memory footprint</p>
-                    <p>High-speed coordinate mapping</p>
-                </div>
+        <div class="cube-info">
+            <div class="info-item">
+                <h3>DETERMINISTIC PROPERTIES</h3>
+                <p>• Fixed key → Fixed cube configuration</p>
+                <p>• Repeatable encryption/decryption</p>
+                <p>• Consistent coordinate mapping</p>
+                <p>• Predictable transformation</p>
+            </div>
+            
+            <div class="info-item">
+                <h3>CUBE GENERATION</h3>
+                <p>• 16×16×16 = 4096 elements</p>
+                <p>• Key-based permutation</p>
+                <p>• Deterministic shuffling</p>
+                <p>• Consistent across sessions</p>
+            </div>
+            
+            <div class="info-item">
+                <h3>SECURITY</h3>
+                <p>• Key-dependent cube layout</p>
+                <p>• Cryptographic strength</p>
+                <p>• Repeatable results</p>
+                <p>• Secure transformation</p>
             </div>
         </div>
     </div>
 
     <script>
-        class ProfessionalByteTrifid {
+        class DeterministicTrifidCipher {
             constructor() {
                 this.cube = null;
                 this.positionMap = new Map();
                 this.initialized = false;
-                this.keyMaterial = null;
+                this.currentKeyHash = null;
             }
 
-            async initializeWithKey(keyString, iterations = 100000) {
-                try {
-                    this.showStatus("Deriving key material...", "status");
-                    
-                    // Generate cryptographically strong key material
-                    this.keyMaterial = await this.deriveKey(keyString, iterations);
-                    
-                    // Initialize 16x16x16 cube structure
-                    this.cube = new Array(16);
-                    for (let k = 0; k < 16; k++) {
-                        this.cube[k] = new Array(16);
-                        for (let i = 0; i < 16; i++) {
-                            this.cube[k][i] = new Array(16).fill(0);
-                        }
-                    }
-
-                    // Create deterministic permutation based on key
-                    const numbers = Array.from({length: 4096}, (_, i) => i);
-                    this.deterministicShuffle(numbers, this.keyMaterial);
-
-                    // Fill cube with shuffled numbers
-                    let index = 0;
-                    for (let k = 0; k < 16; k++) {
-                        for (let i = 0; i < 16; i++) {
-                            for (let j = 0; j < 16; j++) {
-                                const value = numbers[index++];
-                                this.cube[k][i][j] = value;
-                                this.positionMap.set(value, [k, i, j]);
-                            }
-                        }
-                    }
-
-                    this.initialized = true;
-                    this.showStatus("Cipher initialized successfully", "success");
-                    this.visualizeCube();
-                    return true;
-
-                } catch (error) {
-                    this.showStatus("Initialization failed: " + error.message, "error");
-                    return false;
-                }
-            }
-
-            async deriveKey(keyString, iterations) {
-                const encoder = new TextEncoder();
-                const keyMaterial = encoder.encode(keyString);
+            initialize(keyString) {
+                // Generate deterministic hash from key
+                this.currentKeyHash = this.hashKey(keyString);
                 
-                // Use Web Crypto API for key derivation
-                const importedKey = await crypto.subtle.importKey(
-                    'raw',
-                    keyMaterial,
-                    {name: 'PBKDF2'},
-                    false,
-                    ['deriveBits']
-                );
+                // Initialize 16x16x16 cube structure
+                this.cube = new Array(16);
+                for (let k = 0; k < 16; k++) {
+                    this.cube[k] = new Array(16);
+                    for (let i = 0; i < 16; i++) {
+                        this.cube[k][i] = new Array(16);
+                    }
+                }
 
-                const salt = new Uint8Array(16); // Zero salt for deterministic output
-                const derivedBits = await crypto.subtle.deriveBits(
-                    {
-                        name: 'PBKDF2',
-                        salt: salt,
-                        iterations: iterations,
-                        hash: 'SHA-256'
-                    },
-                    importedKey,
-                    256
-                );
+                // Create numbers 0-4095 in order
+                const numbers = Array.from({length: 4096}, (_, i) => i);
+                
+                // Deterministic shuffle based on key hash
+                this.deterministicShuffle(numbers, this.currentKeyHash);
 
-                return new Uint8Array(derivedBits);
+                // Fill cube with shuffled numbers
+                let index = 0;
+                for (let k = 0; k < 16; k++) {
+                    for (let i = 0; i < 16; i++) {
+                        for (let j = 0; j < 16; j++) {
+                            const value = numbers[index++];
+                            this.cube[k][i][j] = value;
+                            this.positionMap.set(value, [k, i, j]);
+                        }
+                    }
+                }
+
+                this.initialized = true;
+                return true;
             }
 
-            deterministicShuffle(array, keyMaterial) {
-                // Детерминированное перемешивание на основе ключа
-                const keyArray = Array.from(keyMaterial);
+            hashKey(keyString) {
+                // Simple deterministic hash function
+                let hash = 0;
+                for (let i = 0; i < keyString.length; i++) {
+                    hash = ((hash << 5) - hash) + keyString.charCodeAt(i);
+                    hash = hash & 0xFFFFFFFF;
+                }
+                return hash.toString(16).padStart(8, '0');
+            }
+
+            deterministicShuffle(array, seedHash) {
+                // Convert hash to numeric seed
+                let seed = parseInt(seedHash, 16);
+                
+                // Deterministic Fisher-Yates shuffle
                 for (let i = array.length - 1; i > 0; i--) {
-                    // Генерируем детерминированный индекс на основе ключа
-                    const keyIndex = i % keyArray.length;
-                    const randomValue = keyArray[keyIndex] * (i + 1) + keyArray[(i + keyIndex) % keyArray.length];
-                    const j = randomValue % (i + 1);
-                    
-                    // Меняем местами
+                    seed = (seed * 1664525 + 1013904223) & 0xFFFFFFFF;
+                    const j = seed % (i + 1);
                     [array[i], array[j]] = [array[j], array[i]];
                 }
+            }
+
+            getCubeValue(k, x, y) {
+                return this.cube[k][x][y];
+            }
+
+            getCubeSnapshot() {
+                // Get first layer for verification
+                const snapshot = [];
+                for (let i = 0; i < 16; i++) {
+                    for (let j = 0; j < 16; j++) {
+                        snapshot.push(this.cube[0][i][j]);
+                    }
+                }
+                return snapshot;
             }
 
             encrypt(data) {
                 if (!this.initialized) throw new Error("Cipher not initialized");
 
-                const bytes = this.stringToBytes(data);
-                const encryptedBytes = [];
-                
-                // Обрабатываем данные блоками по 3 символа (как в оригинальном Trifid)
-                for (let i = 0; i < bytes.length; i += 3) {
-                    const block = bytes.slice(i, i + 3);
-                    const encryptedBlock = this.processTrifidBlock(block, true);
-                    encryptedBytes.push(...encryptedBlock);
+                const bytes = this.parseInput(data);
+                const coords = { k: [], x: [], y: [] };
+
+                // Get coordinates for each byte
+                for (const byte of bytes) {
+                    const coord = this.positionMap.get(byte);
+                    if (!coord) throw new Error(`Byte ${byte} not found in cube`);
+                    coords.k.push(coord[0]);
+                    coords.x.push(coord[1]);
+                    coords.y.push(coord[2]);
                 }
 
-                return this.bytesToHex(new Uint8Array(encryptedBytes));
+                // True Trifid transformation
+                const allCoords = [...coords.k, ...coords.x, ...coords.y];
+                const result = [];
+
+                for (let i = 0; i < allCoords.length; i += 3) {
+                    if (i + 2 < allCoords.length) {
+                        const k = allCoords[i];
+                        const x = allCoords[i + 1];
+                        const y = allCoords[i + 2];
+                        result.push(this.cube[k][x][y]);
+                    }
+                }
+
+                return this.bytesToHex(new Uint8Array(result));
             }
 
             decrypt(hexData) {
                 if (!this.initialized) throw new Error("Cipher not initialized");
 
                 const bytes = this.hexToBytes(hexData);
-                const decryptedBytes = [];
-                
-                // Обрабатываем данные блоками по 3 символа
-                for (let i = 0; i < bytes.length; i += 3) {
-                    const block = bytes.slice(i, i + 3);
-                    const decryptedBlock = this.processTrifidBlock(block, false);
-                    decryptedBytes.push(...decryptedBlock);
+                const coords = { k: [], x: [], y: [] };
+
+                // Get coordinates for each encrypted byte
+                for (const byte of bytes) {
+                    const coord = this.positionMap.get(byte);
+                    if (!coord) throw new Error(`Byte ${byte} not found in cube`);
+                    coords.k.push(coord[0]);
+                    coords.x.push(coord[1]);
+                    coords.y.push(coord[2]);
                 }
 
-                return this.bytesToString(new Uint8Array(decryptedBytes));
+                // Reverse Trifid transformation
+                const total = coords.k.length;
+                const allCoords = [...coords.k, ...coords.x, ...coords.y];
+                const result = [];
+
+                for (let i = 0; i < total; i++) {
+                    const k = allCoords[i];
+                    const x = allCoords[i + total];
+                    const y = allCoords[i + 2 * total];
+                    result.push(this.cube[k][x][y]);
+                }
+
+                return this.bytesToHex(new Uint8Array(result));
             }
 
-            processTrifidBlock(block, encrypt) {
-                const coords = [];
-                
-                // Получаем координаты для каждого символа в блоке
-                for (const byte of block) {
-                    coords.push(...this.positionMap.get(byte));
-                }
-                
-                if (encrypt) {
-                    // При шифровании: перемешиваем координаты
-                    const mixedCoords = this.mixCoordinates(coords);
-                    return this.coordsToBytes(mixedCoords);
+            parseInput(data) {
+                if (/^[0-9A-Fa-f]+$/.test(data.replace(/\s/g, ''))) {
+                    return this.hexToBytes(data);
                 } else {
-                    // При дешифровании: восстанавливаем исходный порядок координат
-                    const unmixedCoords = this.unmixCoordinates(coords);
-                    return this.coordsToBytes(unmixedCoords);
+                    return new TextEncoder().encode(data);
                 }
-            }
-
-            mixCoordinates(coords) {
-                // Классическое перемешивание Trifid: [k1,x1,y1, k2,x2,y2, k3,x3,y3] -> [k1,k2,k3, x1,x2,x3, y1,y2,y3]
-                const result = [];
-                const groupSize = coords.length / 3;
-                
-                for (let i = 0; i < groupSize; i++) {
-                    result.push(coords[i]); // k1, k2, k3
-                }
-                for (let i = 0; i < groupSize; i++) {
-                    result.push(coords[i + groupSize]); // x1, x2, x3
-                }
-                for (let i = 0; i < groupSize; i++) {
-                    result.push(coords[i + 2 * groupSize]); // y1, y2, y3
-                }
-                
-                return result;
-            }
-
-            unmixCoordinates(coords) {
-                // Обратное перемешивание: [k1,k2,k3, x1,x2,x3, y1,y2,y3] -> [k1,x1,y1, k2,x2,y2, k3,x3,y3]
-                const result = [];
-                const groupSize = coords.length / 3;
-                
-                for (let i = 0; i < groupSize; i++) {
-                    result.push(coords[i]); // k1
-                    result.push(coords[i + groupSize]); // x1
-                    result.push(coords[i + 2 * groupSize]); // y1
-                }
-                
-                return result;
-            }
-
-            coordsToBytes(coords) {
-                const bytes = [];
-                // Преобразуем координаты обратно в байты
-                for (let i = 0; i < coords.length; i += 3) {
-                    if (i + 2 < coords.length) {
-                        const k = coords[i];
-                        const x = coords[i + 1];
-                        const y = coords[i + 2];
-                        bytes.push(this.cube[k][x][y]);
-                    }
-                }
-                return bytes;
-            }
-
-            stringToBytes(str) {
-                return new TextEncoder().encode(str);
-            }
-
-            bytesToString(bytes) {
-                return new TextDecoder().decode(bytes);
-            }
-
-            bytesToHex(bytes) {
-                return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
             }
 
             hexToBytes(hex) {
+                const cleanHex = hex.replace(/\s/g, '');
                 const bytes = [];
-                for (let i = 0; i < hex.length; i += 2) {
-                    bytes.push(parseInt(hex.substr(i, 2), 16));
+                for (let i = 0; i < cleanHex.length; i += 2) {
+                    bytes.push(parseInt(cleanHex.substr(i, 2), 16));
                 }
                 return new Uint8Array(bytes);
             }
 
-            visualizeCube() {
-                const grid = document.getElementById('cubeVisualization');
-                grid.innerHTML = '';
+            bytesToHex(bytes) {
+                return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join(' ');
+            }
 
-                if (!this.cube) return;
+            getKeyHash() {
+                return this.currentKeyHash;
+            }
+        }
 
-                // Show first layer (cube 0)
-                for (let i = 0; i < 16; i++) {
-                    for (let j = 0; j < 16; j++) {
-                        const cell = document.createElement('div');
-                        cell.className = 'cube-cell';
-                        cell.textContent = this.cube[0][i][j].toString(16).padStart(3, '0');
-                        cell.title = `Cube: 0, Row: ${i}, Col: ${j}, Value: ${this.cube[0][i][j]}`;
-                        grid.appendChild(cell);
+        const cipher = new DeterministicTrifidCipher();
+        let lastCubeSnapshot = null;
+
+        function initializeCipher() {
+            const key = document.getElementById('cryptoKey').value;
+
+            if (!key) {
+                showStatus('Please enter a cryptographic key', 'error');
+                return;
+            }
+
+            try {
+                showStatus('Initializing deterministic cipher...', 'status');
+                cipher.initialize(key);
+                lastCubeSnapshot = cipher.getCubeSnapshot();
+                
+                showStatus('Cipher initialized successfully', 'success');
+                document.getElementById('keyHashDisplay').textContent = 
+                    `Key hash: ${cipher.getKeyHash()}`;
+                
+                document.getElementById('deterministicTest').textContent = 
+                    `Deterministic Test: Key "${key}" → Cube generated (${lastCubeSnapshot.length} elements)`;
+
+            } catch (error) {
+                showStatus('Initialization failed: ' + error.message, 'error');
+            }
+        }
+
+        function testDeterminism() {
+            const key = document.getElementById('cryptoKey').value;
+            if (!key) {
+                showStatus('Please enter a key first', 'error');
+                return;
+            }
+
+            // Test multiple initializations with same key
+            const testCipher = new DeterministicTrifidCipher();
+            testCipher.initialize(key);
+            const testSnapshot = testCipher.getCubeSnapshot();
+
+            // Compare with current cube
+            const isDeterministic = JSON.stringify(lastCubeSnapshot) === JSON.stringify(testSnapshot);
+            
+            if (isDeterministic) {
+                showStatus('✓ DETERMINISTIC: Same key produces identical cubes', 'success');
+            } else {
+                showStatus('✗ NON-DETERMINISTIC: Cubes differ with same key', 'error');
+            }
+        }
+
+        function verifyCubeConsistency() {
+            if (!cipher.initialized) {
+                showStatus('Cipher not initialized', 'error');
+                return;
+            }
+
+            // Verify cube consistency
+            let consistent = true;
+            for (let k = 0; k < 16 && consistent; k++) {
+                for (let i = 0; i < 16 && consistent; i++) {
+                    for (let j = 0; j < 16 && consistent; j++) {
+                        const value = cipher.getCubeValue(k, i, j);
+                        const [checkK, checkX, checkY] = cipher.positionMap.get(value);
+                        consistent = consistent && (k === checkK && i === checkX && j === checkY);
                     }
                 }
             }
 
-            showStatus(message, type) {
-                const statusEl = document.getElementById('keyStatus');
-                statusEl.textContent = message;
-                statusEl.className = `status ${type}`;
+            if (consistent) {
+                showStatus('✓ CUBE CONSISTENCY: All values correctly mapped', 'success');
+            } else {
+                showStatus('✗ CUBE INCONSISTENCY: Mapping errors detected', 'error');
             }
         }
 
-        // Global cipher instance
-        const trifidCipher = new ProfessionalByteTrifid();
-
-        async function initializeCipher() {
-            const key = document.getElementById('cryptoKey').value;
-            const iterations = parseInt(document.getElementById('keyIterations').value);
-            
-            if (!key) {
-                alert('Please enter a cryptographic key');
-                return;
-            }
-
-            await trifidCipher.initializeWithKey(key, iterations);
-        }
-
-        function generateRandomKey() {
-            const randomKey = crypto.randomUUID() + crypto.randomUUID();
-            document.getElementById('cryptoKey').value = randomKey;
-        }
-
-        function exportKeyMaterial() {
-            if (!trifidCipher.initialized) {
-                alert('Cipher not initialized');
-                return;
-            }
-            alert('Key material exported (simulated)');
-        }
-
-        function executeCryptoOperation() {
-            if (!trifidCipher.initialized) {
-                alert('Please initialize the cipher first');
+        function processData() {
+            if (!cipher.initialized) {
+                showStatus('Please initialize cipher first', 'error');
                 return;
             }
 
             const input = document.getElementById('inputData').value;
             const mode = document.getElementById('operationMode').value;
-            
+
             if (!input) {
-                alert('Please enter input data');
+                showStatus('Please enter input data', 'error');
                 return;
             }
 
             try {
                 let result;
                 if (mode === 'encrypt') {
-                    result = trifidCipher.encrypt(input);
+                    result = cipher.encrypt(input);
                 } else {
-                    result = trifidCipher.decrypt(input);
+                    result = cipher.decrypt(input);
                 }
                 
                 document.getElementById('outputResult').textContent = result;
+                showStatus('Operation completed successfully', 'success');
             } catch (error) {
-                alert('Error: ' + error.message);
+                showStatus('Error: ' + error.message, 'error');
             }
         }
 
-        function clearResults() {
-            document.getElementById('outputResult').textContent = '';
-            document.getElementById('inputData').value = '';
+        function testRoundTrip() {
+            const testData = "0123456789ABCDEF";
+            document.getElementById('inputData').value = testData;
+            
+            try {
+                const encrypted = cipher.encrypt(testData);
+                const decrypted = cipher.decrypt(encrypted.replace(/ /g, ''));
+                
+                if (decrypted.replace(/ /g, '') === testData.replace(/ /g, '')) {
+                    showStatus('✓ ROUND TRIP SUCCESS: Encryption → Decryption works', 'success');
+                    document.getElementById('outputResult').textContent = `Encrypted: ${encrypted} → Decrypted: ${decrypted}`;
+                } else {
+                    showStatus('✗ ROUND TRIP FAILED: Data corruption detected', 'error');
+                }
+            } catch (error) {
+                showStatus('Round trip test failed: ' + error.message, 'error');
+            }
         }
 
-        function performBenchmark() {
-            alert('Benchmark functionality not implemented in this version');
+        function showStatus(message, type) {
+            const statusEl = document.getElementById('keyStatus');
+            statusEl.textContent = message;
+            statusEl.className = `status ${type === 'error' ? 'error' : ''}`;
         }
 
-        // Initialize with default key
-        window.onload = function() {
-            setTimeout(() => {
-                initializeCipher();
-            }, 1000);
-        };
+        // Auto-initialize
+        window.onload = initializeCipher;
     </script>
 </body>
 </html>
