@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Professional Homophonic Cipher with Affine CBC</title>
+    <title>Professional Homophonic Cipher</title>
     <style>
         :root {
             --primary-dark: #1a1a2e;
@@ -33,7 +33,7 @@
         }
         
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 20px;
         }
@@ -57,11 +57,11 @@
             color: transparent;
         }
         
-        .description {
-            font-size: 1.1rem;
-            opacity: 0.9;
-            max-width: 800px;
-            margin: 0 auto;
+        .control-panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
         }
         
         .main-content {
@@ -72,7 +72,7 @@
         }
         
         @media (max-width: 900px) {
-            .main-content {
+            .control-panel, .main-content {
                 grid-template-columns: 1fr;
             }
         }
@@ -93,6 +93,12 @@
             border-bottom: 2px solid var(--accent);
         }
         
+        h3 {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: var(--highlight);
+        }
+        
         .input-group {
             margin-bottom: 20px;
         }
@@ -103,7 +109,7 @@
             font-weight: 600;
         }
         
-        input, textarea, button {
+        input, textarea, button, select {
             width: 100%;
             padding: 12px 15px;
             border: none;
@@ -114,7 +120,7 @@
             transition: all 0.3s ease;
         }
         
-        input:focus, textarea:focus {
+        input:focus, textarea:focus, select:focus {
             outline: none;
             background: rgba(255, 255, 255, 0.18);
             box-shadow: 0 0 0 2px var(--highlight);
@@ -138,6 +144,55 @@
         button:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(233, 69, 96, 0.4);
+        }
+        
+        button.secondary {
+            background: linear-gradient(45deg, #4361ee, #3a0ca3);
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--accent);
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--success);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(30px);
         }
         
         .result {
@@ -204,17 +259,43 @@
             background: rgba(255, 255, 255, 0.05);
         }
         
-        .tech-info {
+        .entropy-display {
             margin-top: 20px;
             padding: 15px;
             background: rgba(0, 0, 0, 0.3);
             border-radius: 8px;
-            font-size: 0.9rem;
         }
         
-        .tech-info h3 {
-            color: var(--highlight);
-            margin-bottom: 10px;
+        .entropy-bar {
+            height: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        
+        .entropy-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--warning), var(--highlight), var(--success));
+            width: 0%;
+            transition: width 1s ease;
+        }
+        
+        .analysis-panel {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+        
+        .flex-row {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .flex-row > * {
+            flex: 1;
         }
     </style>
 </head>
@@ -222,19 +303,67 @@
     <div class="container">
         <header>
             <h1>Professional Homophonic Cipher</h1>
-            <p class="description">Affine transformation in CBC mode with homophonic substitution</p>
+            <p class="description">Advanced cryptographic system with CBC mode and entropy analysis</p>
         </header>
+        
+        <div class="control-panel">
+            <div class="panel">
+                <h2>Configuration</h2>
+                <div class="input-group">
+                    <label for="cbc-mode">CBC Mode:</label>
+                    <label class="switch">
+                        <input type="checkbox" id="cbc-mode" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                
+                <div class="input-group">
+                    <label for="affine-mode">Affine Transformation:</label>
+                    <label class="switch">
+                        <input type="checkbox" id="affine-mode" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                
+                <div class="input-group">
+                    <label for="dependency-type">Dependency Type:</label>
+                    <select id="dependency-type">
+                        <option value="position">Position-based</option>
+                        <option value="previous">Previous cipher value</option>
+                        <option value="both">Both (Position + Previous)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <h2>Entropy Analysis</h2>
+                <div class="input-group">
+                    <label>Current Entropy:</label>
+                    <div class="entropy-display">
+                        <div id="entropy-value">0.00 bits/symbol</div>
+                        <div class="entropy-bar">
+                            <div class="entropy-fill" id="entropy-fill"></div>
+                        </div>
+                        <div id="entropy-quality">Quality: Not calculated</div>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <button id="analyze-btn" class="secondary">Analyze Ciphertext Entropy</button>
+                </div>
+            </div>
+        </div>
         
         <div class="main-content">
             <div class="panel">
                 <h2>Encryption</h2>
                 <div class="input-group">
                     <label for="encryption-key">Encryption Key:</label>
-                    <input type="text" id="encryption-key" placeholder="Enter encryption key" value="CRYPTOKEY">
+                    <input type="text" id="encryption-key" placeholder="Enter encryption key" value="MASTERKEY">
                 </div>
                 <div class="input-group">
                     <label for="plaintext">Plaintext:</label>
-                    <textarea id="plaintext" placeholder="Enter text to encrypt">HELLO WORLD</textarea>
+                    <textarea id="plaintext" placeholder="Enter text to encrypt">SECRET MESSAGE</textarea>
                 </div>
                 <button id="encrypt-btn">Encrypt</button>
                 <div class="input-group">
@@ -247,10 +376,13 @@
                 <h2>Decryption</h2>
                 <div class="input-group">
                     <label for="decryption-key">Decryption Key:</label>
-                    <input type="text" id="decryption-key" placeholder="Enter decryption key" value="CRYPTOKEY">
+                    <div class="flex-row">
+                        <input type="text" id="decryption-key" placeholder="Enter decryption key" value="MASTERKEY">
+                        <button id="test-key-btn" class="secondary">Test Key</button>
+                    </div>
                 </div>
                 <div class="input-group">
-                    <label for="ciphertext">Ciphertext (5-digit numbers):</label>
+                    <label for="ciphertext">Ciphertext:</label>
                     <textarea id="ciphertext" placeholder="Enter numbers for decryption"></textarea>
                 </div>
                 <button id="decrypt-btn">Decrypt</button>
@@ -262,11 +394,11 @@
         </div>
         
         <div class="panel">
-            <h2>Homophone Table</h2>
+            <h2>Homophone Table & Analysis</h2>
             
             <div class="input-group">
                 <label for="table-key">Table Generation Key:</label>
-                <input type="text" id="table-key" placeholder="Enter table generation key" value="TABLEKEY">
+                <input type="text" id="table-key" placeholder="Enter table generation key" value="TABLEKEY123">
             </div>
             
             <div class="input-group">
@@ -282,43 +414,52 @@
             </div>
             
             <div class="input-group">
-                <label>Table Preview (first 10 letters):</label>
+                <label>Table Preview:</label>
                 <div class="key-visualization" id="key-table">
                     <!-- Table will be here -->
                 </div>
             </div>
             
-            <div class="tech-info">
-                <h3>Technical Implementation:</h3>
-                <p><strong>Affine CBC Formula:</strong> C_i = (P_i + K_i + C_{i-1}) mod 26</p>
-                <p><strong>Decryption:</strong> P_i = (C_i - K_i - C_{i-1}) mod 26</p>
-                <p><strong>Mode:</strong> Cipher Block Chaining (CBC) with block size 1</p>
-                <p><strong>Alphabet:</strong> 26 letters (A-Z)</p>
+            <div class="analysis-panel">
+                <h3>Technical Analysis</h3>
+                <div class="stats" id="technical-analysis">
+                    <strong>Current Mode:</strong> CBC Enabled, Affine Enabled, Dependency: Position-based<br>
+                    <strong>Formula:</strong> C_i = (P_i + K_i + C_{i-1}) mod 26<br>
+                    <strong>Decryption:</strong> P_i = (C_i - K_i - C_{i-1}) mod 26<br>
+                    <strong>Security Level:</strong> High (CBC chaining prevents pattern analysis)
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Constants and settings
+        // Constants
         const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         const ALPHABET_SIZE = ALPHABET.length;
         const HOMOPHONE_COUNT = 99998;
         const HOMOPHONE_MIN = 1;
         const HOMOPHONE_MAX = 99999;
         
+        // Configuration
+        let config = {
+            cbcMode: true,
+            affineMode: true,
+            dependencyType: 'position'
+        };
+        
         // Homophone tables
         let homophoneMap = {};
         let reverseHomophoneMap = {};
+        let currentCiphertext = '';
         
-        // Initialize empty table
+        // Initialize
         initializeEmptyHomophoneTable();
+        updateConfigDisplay();
         
-        // Format number as 5-digit string
         function formatHomophoneNumber(num) {
             return num.toString().padStart(5, '0');
         }
         
-        // Initialize empty table
         function initializeEmptyHomophoneTable() {
             homophoneMap = {};
             reverseHomophoneMap = {};
@@ -328,7 +469,6 @@
             }
         }
         
-        // Deterministic random generator
         function createDeterministicRandom(key) {
             let hash = 0;
             for (let i = 0; i < key.length; i++) {
@@ -343,7 +483,6 @@
             };
         }
         
-        // Fisher-Yates shuffle
         function fisherYatesShuffle(array, randomFunc) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(randomFunc() * (i + 1));
@@ -352,20 +491,16 @@
             return array;
         }
         
-        // Generate homophone table
         function generateHomophoneTable(key) {
             const random = createDeterministicRandom(key);
-            
-            // Create array of all homophone numbers
             const allHomophones = [];
+            
             for (let i = HOMOPHONE_MIN; i <= HOMOPHONE_MAX; i++) {
                 allHomophones.push(i);
             }
             
-            // Deterministic shuffle
             fisherYatesShuffle(allHomophones, random);
             
-            // Equal distribution
             const baseHomophonesPerLetter = Math.floor(HOMOPHONE_COUNT / ALPHABET_SIZE);
             const remainder = HOMOPHONE_COUNT % ALPHABET_SIZE;
             
@@ -375,9 +510,7 @@
                 const letter = ALPHABET[i];
                 let count = baseHomophonesPerLetter;
                 
-                if (i < remainder) {
-                    count++;
-                }
+                if (i < remainder) count++;
                 
                 for (let j = 0; j < count && homophoneIndex < allHomophones.length; j++) {
                     const homophoneNum = allHomophones[homophoneIndex++];
@@ -391,36 +524,46 @@
             return homophoneMap;
         }
         
-        // Affine CBC transformation
-        function affineCBC(letter, key, position, prevCipherNum = 0, encrypt = true) {
+        function affineTransformation(letter, key, position, prevCipherNum = 0) {
             const keyChar = key[position % key.length];
             const keyNum = ALPHABET.indexOf(keyChar);
             const letterNum = ALPHABET.indexOf(letter);
             
-            if (encrypt) {
-                // Encryption: (P_i + K_i + C_{i-1}) mod 26
-                const cipherNum = (letterNum + keyNum + prevCipherNum) % ALPHABET_SIZE;
-                return { char: ALPHABET[cipherNum], num: cipherNum };
-            } else {
-                // Decryption: (C_i - K_i - C_{i-1}) mod 26
-                let plainNum = (letterNum - keyNum - prevCipherNum) % ALPHABET_SIZE;
-                if (plainNum < 0) plainNum += ALPHABET_SIZE;
-                return { char: ALPHABET[plainNum], num: plainNum };
+            if (config.dependencyType === 'position') {
+                return (letterNum + keyNum + position) % ALPHABET_SIZE;
+            } else if (config.dependencyType === 'previous') {
+                return (letterNum + keyNum + prevCipherNum) % ALPHABET_SIZE;
+            } else { // both
+                return (letterNum + keyNum + position + prevCipherNum) % ALPHABET_SIZE;
             }
         }
         
-        // Get random homophone
+        function inverseAffineTransformation(cipherNum, key, position, prevCipherNum = 0) {
+            const keyChar = key[position % key.length];
+            const keyNum = ALPHABET.indexOf(keyChar);
+            
+            let plainNum;
+            if (config.dependencyType === 'position') {
+                plainNum = (cipherNum - keyNum - position) % ALPHABET_SIZE;
+            } else if (config.dependencyType === 'previous') {
+                plainNum = (cipherNum - keyNum - prevCipherNum) % ALPHABET_SIZE;
+            } else { // both
+                plainNum = (cipherNum - keyNum - position - prevCipherNum) % ALPHABET_SIZE;
+            }
+            
+            if (plainNum < 0) plainNum += ALPHABET_SIZE;
+            return plainNum;
+        }
+        
         function getRandomHomophone(letter) {
             const homophones = homophoneMap[letter];
             if (!homophones || homophones.length === 0) {
                 throw new Error(`No homophones for letter: ${letter}`);
             }
-            
             const randomIndex = Math.floor(Math.random() * homophones.length);
             return homophones[randomIndex];
         }
         
-        // Encryption function
         function encryptText() {
             const key = document.getElementById('encryption-key').value.toUpperCase().replace(/[^A-Z]/g, '');
             const plaintext = document.getElementById('plaintext').value.toUpperCase();
@@ -443,30 +586,36 @@
                 let position = 0;
                 for (let char of plaintext) {
                     if (ALPHABET.includes(char)) {
-                        // 1. Affine CBC transformation
-                        const transformed = affineCBC(char, key, position, prevCipherNum, true);
+                        let transformedChar = char;
                         
-                        // 2. Homophonic substitution
-                        const homophone = getRandomHomophone(transformed.char);
+                        if (config.affineMode) {
+                            const transformedNum = affineTransformation(char, key, position, prevCipherNum);
+                            transformedChar = ALPHABET[transformedNum];
+                            
+                            if (config.cbcMode) {
+                                prevCipherNum = transformedNum;
+                            }
+                        }
+                        
+                        const homophone = getRandomHomophone(transformedChar);
                         ciphertext.push(homophone);
-                        
-                        prevCipherNum = transformed.num;
                         position++;
                     } else {
-                        // Non-alphabet characters
                         ciphertext.push(char);
                     }
                 }
                 
-                resultElement.innerHTML = ciphertext.join(' ');
+                currentCiphertext = ciphertext.join(' ');
+                resultElement.innerHTML = currentCiphertext;
+                document.getElementById('ciphertext').value = currentCiphertext;
                 document.getElementById('generation-status').textContent = 'Text encrypted successfully';
                 document.getElementById('generation-status').className = 'success';
+                
             } catch (error) {
                 resultElement.innerHTML = `<span class="error">Encryption error: ${error.message}</span>`;
             }
         }
         
-        // Decryption function
         function decryptText() {
             const key = document.getElementById('decryption-key').value.toUpperCase().replace(/[^A-Z]/g, '');
             const ciphertext = document.getElementById('ciphertext').value;
@@ -496,11 +645,18 @@
                             const cipherChar = reverseHomophoneMap[numStr];
                             const cipherNum = ALPHABET.indexOf(cipherChar);
                             
-                            // Reverse affine CBC transformation
-                            const originalChar = affineCBC(cipherChar, key, position, prevCipherNum, false);
-                            plaintext.push(originalChar.char);
+                            let originalChar = cipherChar;
                             
-                            prevCipherNum = cipherNum;
+                            if (config.affineMode) {
+                                const originalNum = inverseAffineTransformation(cipherNum, key, position, prevCipherNum);
+                                originalChar = ALPHABET[originalNum];
+                                
+                                if (config.cbcMode) {
+                                    prevCipherNum = cipherNum;
+                                }
+                            }
+                            
+                            plaintext.push(originalChar);
                             position++;
                         } else {
                             plaintext.push('?');
@@ -513,12 +669,90 @@
                 resultElement.textContent = plaintext.join('');
                 document.getElementById('generation-status').textContent = 'Text decrypted successfully';
                 document.getElementById('generation-status').className = 'success';
+                
             } catch (error) {
                 resultElement.innerHTML = `<span class="error">Decryption error: ${error.message}</span>`;
             }
         }
         
-        // Update table statistics
+        function testKey() {
+            const originalKey = document.getElementById('encryption-key').value;
+            const testKey = document.getElementById('decryption-key').value;
+            
+            if (originalKey !== testKey) {
+                document.getElementById('decryption-result').innerHTML = 
+                    '<span class="error">Keys don\'t match! Decryption will fail.</span>';
+            } else {
+                document.getElementById('decryption-result').innerHTML = 
+                    '<span class="success">Keys match. Ready for decryption.</span>';
+            }
+        }
+        
+        function analyzeEntropy() {
+            const ciphertext = document.getElementById('ciphertext').value;
+            if (!ciphertext) return;
+            
+            const numbers = ciphertext.match(/\d{5}/g) || [];
+            if (numbers.length === 0) return;
+            
+            // Calculate frequency distribution
+            const freqMap = {};
+            numbers.forEach(num => {
+                freqMap[num] = (freqMap[num] || 0) + 1;
+            });
+            
+            // Calculate entropy
+            let entropy = 0;
+            const total = numbers.length;
+            
+            for (let num in freqMap) {
+                const probability = freqMap[num] / total;
+                entropy -= probability * Math.log2(probability);
+            }
+            
+            // Update display
+            const entropyValue = entropy.toFixed(2);
+            const entropyPercent = Math.min(100, (entropy / 16.61) * 100); // 16.61 is max for 5-digit numbers
+            
+            document.getElementById('entropy-value').textContent = `${entropyValue} bits/symbol`;
+            document.getElementById('entropy-fill').style.width = `${entropyPercent}%`;
+            
+            let quality;
+            if (entropy > 15) quality = 'Excellent';
+            else if (entropy > 14) quality = 'Very Good';
+            else if (entropy > 13) quality = 'Good';
+            else if (entropy > 12) quality = 'Fair';
+            else quality = 'Poor';
+            
+            document.getElementById('entropy-quality').textContent = `Quality: ${quality}`;
+        }
+        
+        function updateConfigDisplay() {
+            document.getElementById('cbc-mode').checked = config.cbcMode;
+            document.getElementById('affine-mode').checked = config.affineMode;
+            document.getElementById('dependency-type').value = config.dependencyType;
+            
+            updateTechnicalAnalysis();
+        }
+        
+        function updateTechnicalAnalysis() {
+            let formula = config.affineMode ? 
+                `C_i = (P_i + K_i + ${config.dependencyType === 'position' ? 'i' : 'C_{i-1}'}) mod 26` :
+                'C_i = P_i (No affine transformation)';
+            
+            let securityLevel = 'High';
+            if (!config.cbcMode && !config.affineMode) securityLevel = 'Low';
+            else if (!config.cbcMode || !config.affineMode) securityLevel = 'Medium';
+            
+            document.getElementById('technical-analysis').innerHTML = `
+                <strong>Current Mode:</strong> CBC ${config.cbcMode ? 'Enabled' : 'Disabled'}, 
+                Affine ${config.affineMode ? 'Enabled' : 'Disabled'}, 
+                Dependency: ${config.dependencyType}<br>
+                <strong>Formula:</strong> ${formula}<br>
+                <strong>Security Level:</strong> ${securityLevel}
+            `;
+        }
+        
         function updateTableStats() {
             let totalHomophones = 0;
             let minHomophones = Infinity;
@@ -535,17 +769,15 @@
                 <strong>Total homophones:</strong> ${totalHomophones}<br>
                 <strong>Range:</strong> ${formatHomophoneNumber(HOMOPHONE_MIN)} - ${formatHomophoneNumber(HOMOPHONE_MAX)}<br>
                 <strong>Min per letter:</strong> ${minHomophones}<br>
-                <strong>Max per letter:</strong> ${maxHomophones}<br>
-                <strong>Equal distribution:</strong> ${minHomophones === maxHomophones ? 'Yes' : 'No'}
+                <strong>Max per letter:</strong> ${maxHomophones}
             `;
         }
         
-        // Render table preview
         function renderKeyTablePreview() {
             const keyTable = document.getElementById('key-table');
             keyTable.innerHTML = '';
             
-            const previewLetters = ALPHABET.slice(0, 10);
+            const previewLetters = ALPHABET.slice(0, 8);
             
             for (let letter of previewLetters) {
                 const row = document.createElement('div');
@@ -559,8 +791,7 @@
                 const homophonesSpan = document.createElement('span');
                 
                 if (homophones.length > 0) {
-                    const preview = homophones.slice(0, 3).join(', ');
-                    homophonesSpan.textContent = `${preview} ... (${homophones.length} total)`;
+                    homophonesSpan.textContent = `${homophones.length} homophones`;
                 } else {
                     homophonesSpan.textContent = 'No homophones';
                     homophonesSpan.style.color = 'var(--warning)';
@@ -570,21 +801,31 @@
                 row.appendChild(homophonesSpan);
                 keyTable.appendChild(row);
             }
-            
-            if (ALPHABET.length > 10) {
-                const moreRow = document.createElement('div');
-                moreRow.className = 'letter-row';
-                moreRow.style.fontStyle = 'italic';
-                moreRow.textContent = `... and ${ALPHABET.length - 10} more letters`;
-                keyTable.appendChild(moreRow);
-            }
         }
         
-        // Initialize on page load
+        // Event listeners
         document.addEventListener('DOMContentLoaded', function() {
-            // Event handlers
+            // Configuration listeners
+            document.getElementById('cbc-mode').addEventListener('change', (e) => {
+                config.cbcMode = e.target.checked;
+                updateConfigDisplay();
+            });
+            
+            document.getElementById('affine-mode').addEventListener('change', (e) => {
+                config.affineMode = e.target.checked;
+                updateConfigDisplay();
+            });
+            
+            document.getElementById('dependency-type').addEventListener('change', (e) => {
+                config.dependencyType = e.target.value;
+                updateConfigDisplay();
+            });
+            
+            // Action listeners
             document.getElementById('encrypt-btn').addEventListener('click', encryptText);
             document.getElementById('decrypt-btn').addEventListener('click', decryptText);
+            document.getElementById('test-key-btn').addEventListener('click', testKey);
+            document.getElementById('analyze-btn').addEventListener('click', analyzeEntropy);
             document.getElementById('generate-table').addEventListener('click', function() {
                 const key = document.getElementById('table-key').value;
                 generateHomophoneTable(key);
