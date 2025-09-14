@@ -3,211 +3,336 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Military-Grade Homophonic Cipher</title>
+    <title>NeonHomophone Cipher</title>
     <style>
         :root {
-            --primary-dark: #0a0e17;
-            --primary: #131a2c;
-            --accent: #1e2a4a;
-            --highlight: #ff2e63;
-            --success: #00e0b0;
-            --warning: #ff9a3c;
-            --error: #ff4277;
-            --text-light: #ffffff;
-            --text-dim: #8892b0;
-            --card-bg: rgba(30, 42, 74, 0.9);
-            --card-border: rgba(255, 255, 255, 0.15);
-            --border-radius: 12px;
+            --background: #0a0a12;
+            --surface: #16162a;
+            --surface-alt: #1c1c34;
+            --primary: #8a2be2;
+            --primary-light: #9370db;
+            --accent: #00bfff;
+            --accent-alt: #00ced1;
+            --text: #e6e6fa;
+            --text-dim: #a0a0c0;
+            --success: #00fa9a;
+            --warning: #ffd700;
+            --error: #ff6b6b;
+            --terminal: #0f0f1f;
+            --terminal-border: #2a2a55;
+            --glow: 0 0 10px var(--accent);
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Inter', system-ui, sans-serif;
+            font-family: 'Fira Code', 'Cascadia Code', monospace;
         }
 
         body {
-            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
-            color: var(--text-light);
+            background: var(--background);
+            color: var(--text);
             min-height: 100vh;
             padding: 20px;
+            line-height: 1.6;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
         }
 
         header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             padding: 30px;
-            background: var(--card-bg);
-            border-radius: var(--border-radius);
-            border: 1px solid var(--card-border);
+            background: var(--surface);
+            border-radius: 16px;
+            border: 1px solid var(--primary);
+            box-shadow: var(--glow);
         }
 
         h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            background: linear-gradient(45deg, var(--highlight), var(--success));
+            font-size: 2.8rem;
+            margin-bottom: 12px;
+            background: linear-gradient(45deg, var(--accent), var(--primary-light));
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
+            text-shadow: 0 0 15px rgba(0, 191, 255, 0.5);
+            letter-spacing: 1px;
         }
 
-        .config-grid {
+        .header-desc {
+            color: var(--text-dim);
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .grid-system {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-
-        .main-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-
-        @media (max-width: 768px) {
-            .config-grid, .main-grid {
-                grid-template-columns: 1fr;
-            }
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 24px;
         }
 
         .card {
-            background: var(--card-bg);
-            padding: 25px;
-            border-radius: var(--border-radius);
-            border: 1px solid var(--card-border);
+            background: var(--surface);
+            padding: 28px;
+            border-radius: 16px;
+            border: 1px solid var(--primary);
+            box-shadow: 0 0 20px rgba(138, 43, 226, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 0 25px rgba(138, 43, 226, 0.3);
+            transform: translateY(-2px);
         }
 
         h2 {
-            font-size: 1.4rem;
-            margin-bottom: 20px;
-            color: var(--success);
-            border-bottom: 2px solid var(--accent);
-            padding-bottom: 10px;
+            font-size: 1.5rem;
+            margin-bottom: 22px;
+            color: var(--accent);
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--primary);
+            display: flex;
+            align-items: center;
+        }
+
+        h2::before {
+            content: "> ";
+            color: var(--accent-alt);
         }
 
         .input-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
         label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             font-weight: 600;
             color: var(--text-dim);
-            font-size: 0.9rem;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         input, textarea, button, select {
             width: 100%;
-            padding: 12px 15px;
+            padding: 14px 18px;
             border: none;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.08);
-            color: var(--text-light);
+            border-radius: 10px;
+            background: var(--surface-alt);
+            color: var(--text);
             font-size: 1rem;
-            border: 1px solid transparent;
+            border: 1px solid var(--primary);
+            transition: all 0.3s ease;
         }
 
         input:focus, textarea:focus, select:focus {
             outline: none;
-            background: rgba(255, 255, 255, 0.12);
-            border-color: var(--highlight);
+            border-color: var(--accent);
+            box-shadow: 0 0 15px rgba(0, 191, 255, 0.3);
         }
 
         textarea {
-            min-height: 100px;
+            min-height: 120px;
             resize: vertical;
             font-family: 'Fira Code', monospace;
         }
 
         button {
-            background: linear-gradient(135deg, var(--highlight), var(--success));
+            background: linear-gradient(135deg, var(--primary), var(--accent));
             color: white;
             font-weight: 600;
             cursor: pointer;
             border: none;
-            margin-top: 10px;
-            transition: transform 0.2s ease;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+
+        button:hover::before {
+            left: 100%;
         }
 
         button:hover {
-            transform: translateY(-2px);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 191, 255, 0.4);
         }
 
         .switch {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            padding: 12px;
+            background: var(--surface-alt);
+            border-radius: 10px;
+            border: 1px solid var(--primary);
         }
 
         .result {
-            margin-top: 15px;
-            padding: 15px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 8px;
-            min-height: 60px;
+            margin-top: 20px;
+            padding: 20px;
+            background: var(--terminal);
+            border-radius: 10px;
+            min-height: 80px;
             font-family: 'Fira Code', monospace;
             white-space: pre-wrap;
             word-break: break-all;
+            border: 1px solid var(--terminal-border);
+            overflow-x: auto;
         }
 
         .status {
-            padding: 10px;
-            border-radius: 6px;
-            margin-top: 10px;
+            padding: 12px;
+            border-radius: 10px;
+            margin-top: 15px;
             font-weight: 600;
+            border: 1px solid;
         }
 
         .status.success {
-            background: rgba(0, 224, 176, 0.15);
+            background: rgba(0, 250, 154, 0.1);
             color: var(--success);
+            border-color: var(--success);
         }
 
         .status.error {
-            background: rgba(255, 66, 119, 0.15);
+            background: rgba(255, 107, 107, 0.1);
             color: var(--error);
+            border-color: var(--error);
         }
 
         .stats {
             font-size: 0.9rem;
             color: var(--text-dim);
-            line-height: 1.5;
+            line-height: 1.6;
+            margin-top: 15px;
+            padding: 15px;
+            background: var(--surface-alt);
+            border-radius: 10px;
+            border: 1px solid var(--primary);
         }
         
         .progress {
-            height: 6px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 3px;
-            margin-top: 10px;
+            height: 8px;
+            background: var(--surface-alt);
+            border-radius: 4px;
+            margin-top: 15px;
             overflow: hidden;
+            border: 1px solid var(--primary);
         }
         
         .progress-bar {
             height: 100%;
-            background: linear-gradient(90deg, var(--highlight), var(--success));
+            background: linear-gradient(90deg, var(--primary), var(--accent));
             width: 0%;
-            transition: width 0.3s ease;
+            transition: width 0.5s ease;
+        }
+
+        .config-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 1100px) {
+            .config-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .grid-system {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .terminal-style {
+            background: var(--terminal);
+            border: 1px solid var(--terminal-border);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .terminal-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--terminal-border);
+        }
+
+        .terminal-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .terminal-red {
+            background: var(--error);
+        }
+
+        .terminal-yellow {
+            background: var(--warning);
+        }
+
+        .terminal-green {
+            background: var(--success);
+        }
+
+        .key-value {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .key {
+            color: var(--text-dim);
+        }
+
+        .value {
+            color: var(--accent);
+            font-weight: 600;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>MILITARY-GRADE HOMOPHONIC CIPHER</h1>
-            <p style="color: var(--text-dim)">PBKDF2 key derivation with non-deterministic encryption</p>
+            <h1>NEONHOMOPHONE CIPHER</h1>
+            <p class="header-desc">Advanced homophonic substitution cipher with PBKDF2 key derivation and non-deterministic encryption</p>
         </header>
 
         <div class="config-grid">
             <div class="card">
-                <h2>Configuration</h2>
+                <h2>CONFIGURATION</h2>
                 
                 <div class="switch">
                     <label for="cbc-mode">CBC Mode</label>
@@ -220,18 +345,18 @@
                 </div>
 
                 <div class="input-group">
-                    <label for="affine-a">Affine parameter a</label>
+                    <label for="affine-a">Affine Parameter A</label>
                     <input type="number" id="affine-a" min="1" max="25" value="5">
                 </div>
 
                 <div class="input-group">
-                    <label for="affine-b">Affine parameter b</label>
+                    <label for="affine-b">Affine Parameter B</label>
                     <input type="number" id="affine-b" min="0" max="25" value="9">
                 </div>
             </div>
 
             <div class="card">
-                <h2>Cryptographic Key</h2>
+                <h2>CRYPTOGRAPHIC KEY</h2>
                 
                 <div class="input-group">
                     <label for="crypto-key">Password</label>
@@ -243,32 +368,47 @@
                     <input type="number" id="key-iterations" min="100000" max="1000000" value="600000">
                 </div>
 
-                <button id="generate-btn">Generate Homophone Table</button>
+                <button id="generate-btn">GENERATE HOMOPHONE TABLE</button>
                 
                 <div class="progress">
                     <div class="progress-bar" id="key-progress"></div>
                 </div>
                 
-                <div id="status" class="status success">Ready</div>
+                <div id="status" class="status success">System Ready</div>
 
-                <div class="stats" id="table-stats">
-                    Key derivation: PBKDF2-SHA512<br>
-                    Homophones: 99,999<br>
-                    Security: 256-bit entropy
+                <div class="terminal-style">
+                    <div class="terminal-header">
+                        <div class="terminal-dot terminal-red"></div>
+                        <div class="terminal-dot terminal-yellow"></div>
+                        <div class="terminal-dot terminal-green"></div>
+                        <span style="margin-left: 10px;">key_info.term</span>
+                    </div>
+                    <div class="key-value">
+                        <span class="key">Key derivation:</span>
+                        <span class="value">PBKDF2-SHA512</span>
+                    </div>
+                    <div class="key-value">
+                        <span class="key">Homophones:</span>
+                        <span class="value">99,999</span>
+                    </div>
+                    <div class="key-value">
+                        <span class="key">Security level:</span>
+                        <span class="value">256-bit</span>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="main-grid">
+        <div class="grid-system">
             <div class="card">
-                <h2>Encryption</h2>
+                <h2>ENCRYPTION</h2>
                 
                 <div class="input-group">
                     <label for="plaintext">Plaintext</label>
                     <textarea id="plaintext">TOP SECRET MESSAGE</textarea>
                 </div>
 
-                <button id="encrypt-btn">Encrypt</button>
+                <button id="encrypt-btn">ENCRYPT</button>
 
                 <div class="input-group">
                     <label>Ciphertext</label>
@@ -277,14 +417,14 @@
             </div>
 
             <div class="card">
-                <h2>Decryption</h2>
+                <h2>DECRYPTION</h2>
                 
                 <div class="input-group">
                     <label for="ciphertext">Ciphertext</label>
                     <textarea id="ciphertext"></textarea>
                 </div>
 
-                <button id="decrypt-btn">Decrypt</button>
+                <button id="decrypt-btn">DECRYPT</button>
 
                 <div class="input-group">
                     <label>Decrypted Text</label>
@@ -398,6 +538,7 @@
             // Show progress
             document.getElementById('key-progress').style.width = '30%';
             document.getElementById('status').textContent = 'Deriving key with PBKDF2...';
+            document.getElementById('status').className = 'status success';
             
             // Derive key using PBKDF2
             derivedKey = await deriveKey(password, iterations);
@@ -532,7 +673,7 @@
             const password = document.getElementById('crypto-key').value;
             const iterations = parseInt(document.getElementById('key-iterations').value);
             const plaintext = document.getElementById('plaintext').value.toUpperCase().replace(/[^A-Z\s]/g, '');
-            const resultElement = document.getElementById('encryption-result'];
+            const resultElement = document.getElementById('encryption-result');
             
             if (!password) {
                 resultElement.innerHTML = '<span style="color: var(--error)">Enter password</span>';
@@ -599,7 +740,7 @@
             const password = document.getElementById('crypto-key').value;
             const iterations = parseInt(document.getElementById('key-iterations').value);
             const ciphertext = document.getElementById('ciphertext').value;
-            const resultElement = document.getElementById('decryption-result'];
+            const resultElement = document.getElementById('decryption-result');
             
             if (!password) {
                 resultElement.innerHTML = '<span style="color: var(--error)">Enter password</span>';
