@@ -469,15 +469,6 @@
                         <input type="number" id="affine-b" min="0" max="25" value="9">
                     </div>
                 </div>
-
-                <div class="input-group">
-                    <label for="iv-type">Initialization Vector</label>
-                    <select id="iv-type">
-                        <option value="fixed">Fixed IV (0)</option>
-                        <option value="key-derived">Key-derived IV</option>
-                        <option value="random">Random IV</option>
-                    </select>
-                </div>
             </div>
 
             <div class="card">
@@ -536,7 +527,7 @@
             
             <div class="input-group">
                 <label for="table-key">Table Generation Key</label>
-                <input type="password" id="table-key" placeholder="Enter cryptographic key" value="CRYPTO_MASTER_KEY_2024">
+                <input type="text" id="table-key" placeholder="Enter cryptographic key" value="CRYPTO_MASTER_KEY_2024">
             </div>
 
             <div class="input-group">
@@ -593,7 +584,7 @@
         // Constants
         const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         const ALPHABET_SIZE = 26;
-        const TOTAL_HOMOPHONES = 99999;
+        const TOTAL_HOMOPHONES = 99998;
         const HOMOPHONE_MIN = 1;
         const HOMOPHONE_MAX = 99999;
 
@@ -602,8 +593,7 @@
             cbcMode: true,
             affineMode: true,
             affineA: 5,
-            affineB: 9,
-            ivType: 'random'
+            affineB: 9
         };
 
         // Homophone tables
@@ -649,15 +639,30 @@
             ).join('');
         }
 
-        async function generateHomophoneTable(key) {
+        function createDeterministicRandom(key) {
+            // Create deterministic PRNG based on key
+            let seed = 0;
+            for (let i = 0; i < key.length; i++) {
+                seed = ((seed << 5) - seed) + key.charCodeAt(i);
+                seed = seed & seed;
+            }
+            
+            return function() {
+                seed = (seed * 1664525 + 1013904223) % 4294967296;
+                return seed / 4294967296;
+            };
+        }
+
+        function generateHomophoneTable(key) {
             addHistoryEntry('Generating homophone table...');
             
+            const random = createDeterministicRandom(key);
             const allHomophones = [];
             const usedNumbers = new Set();
 
-            // Generate exactly 99998 unique numbers
+            // Generate exactly 99998 unique numbers deterministically
             while (allHomophones.length < TOTAL_HOMOPHONES) {
-                const num = Math.floor(Math.random() * (HOMOPHONE_MAX - HOMOPHONE_MIN + 1)) + HOMOPHONE_MIN;
+                const num = Math.floor(random() * (HOMOPHONE_MAX - HOMOPHONE_MIN + 1)) + HOMOPHONE_MIN;
                 const formattedNum = formatHomophoneNumber(num);
                 
                 if (!usedNumbers.has(formattedNum)) {
@@ -666,14 +671,13 @@
                 }
             }
 
-            // Fisher-Yates shuffle with key-based seed
+            // Fisher-Yates shuffle with deterministic seed
             for (let i = allHomophones.length - 1; i > 0; i--) {
-                const seed = key.charCodeAt(i % key.length);
-                const j = Math.floor((seed / 255) * (i + 1));
+                const j = Math.floor(random() * (i + 1));
                 [allHomophones[i], allHomophones[j]] = [allHomophones[j], allHomophones[i]];
             }
 
-            // Distribute evenly
+            // Distribute evenly among letters
             const baseCount = Math.floor(TOTAL_HOMOPHONES / ALPHABET_SIZE);
             const remainder = TOTAL_HOMOPHONES % ALPHABET_SIZE;
             let index = 0;
@@ -930,7 +934,6 @@
             document.getElementById('affine-mode').checked = config.affineMode;
             document.getElementById('affine-a').value = config.affineA;
             document.getElementById('affine-b').value = config.affineB;
-            document.getElementById('iv-type').value = config.ivType;
             
             updateTechnicalAnalysis();
         }
@@ -1024,28 +1027,29 @@
                 updateConfigDisplay();
                 addHistoryEntry(`Affine parameter b set to ${config.affineB}`);
             });
-            
-            document.getElementById('iv-type').addEventListener('change', (e) => {
-                config.ivType = e.target.value;
-                addHistoryEntry(`IV type set to ${config.ivType}`);
-            });
 
             // Action listeners
             document.getElementById('encrypt-btn').addEventListener('click', encryptText);
             document.getElementById('decrypt-btn').addEventListener('click', decryptText);
             document.getElementById('analyze-btn').addEventListener('click', analyzeEntropy);
-            document.getElementById('generate-table').addEventListener('click', async function() {
+            document.getElementById('generate-table').addEventListener('click', function() {
                 const key = document.getElementById('table-key').value;
                 if (!key) {
                     showError(document.getElementById('generation-status'), 'Enter table generation key');
                     return;
                 }
                 
-                await generateHomophoneTable(key);
+                generateHomophoneTable(key);
                 updateTableStats();
                 renderKeyTablePreview();
                 showSuccess('Homophone table generated successfully');
             });
+
+            // Auto-generate table on load
+            const initialKey = document.getElementById('table-key').value;
+            generateHomophoneTable(initialKey);
+            updateTableStats();
+            renderKeyTablePreview();
         });
     </script>
 </body>
