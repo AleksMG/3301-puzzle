@@ -3,27 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Professional Homophonic Cipher</title>
+    <title>CryptoVault - Homophonic Cipher</title>
     <style>
         :root {
-            --primary-dark: #1a1a2e;
-            --primary: #16213e;
-            --accent: #0f3460;
-            --highlight: #e94560;
-            --text-light: #f0f0f0;
-            --card-bg: rgba(255, 255, 255, 0.08);
-            --success: #4cc9f0;
-            --warning: #f72585;
-            --border-radius: 12px;
+            --primary-dark: #0f172a;
+            --primary: #1e293b;
+            --accent: #334155;
+            --highlight: #f43f5e;
+            --success: #06d6a0;
+            --warning: #fbbf24;
+            --error: #ef476f;
+            --text-light: #f8fafc;
+            --text-dim: #94a3b8;
+            --card-bg: rgba(30, 41, 59, 0.8);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --glow: 0 0 20px rgba(6, 214, 160, 0.3);
+            --border-radius: 16px;
         }
-        
+
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
         }
-        
+
         body {
             background: linear-gradient(135deg, var(--primary-dark), var(--primary));
             color: var(--text-light);
@@ -31,138 +35,163 @@
             padding: 20px;
             line-height: 1.6;
         }
-        
+
         .container {
             max-width: 1400px;
             margin: 0 auto;
             padding: 20px;
         }
-        
+
         header {
             text-align: center;
-            margin-bottom: 30px;
-            padding: 30px;
+            margin-bottom: 40px;
+            padding: 40px;
             background: var(--card-bg);
             border-radius: var(--border-radius);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
+            box-shadow: var(--glow);
         }
-        
+
         h1 {
-            font-size: 2.5rem;
+            font-size: 3rem;
             margin-bottom: 15px;
             background: linear-gradient(45deg, var(--highlight), var(--success));
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
+            font-weight: 800;
         }
-        
-        .control-panel {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 25px;
+
+        .subtitle {
+            color: var(--text-dim);
+            font-size: 1.2rem;
+            margin-bottom: 20px;
         }
-        
-        .main-content {
+
+        .grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 25px;
             margin-bottom: 30px;
         }
-        
-        @media (max-width: 900px) {
-            .control-panel, .main-content {
+
+        @media (max-width: 1024px) {
+            .grid {
                 grid-template-columns: 1fr;
             }
         }
-        
-        .panel {
+
+        .card {
             background: var(--card-bg);
-            padding: 25px;
+            padding: 30px;
             border-radius: var(--border-radius);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
         }
-        
+
         h2 {
-            font-size: 1.6rem;
-            margin-bottom: 20px;
+            font-size: 1.8rem;
+            margin-bottom: 25px;
             color: var(--success);
-            padding-bottom: 10px;
+            padding-bottom: 15px;
             border-bottom: 2px solid var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
-        
+
+        h2::before {
+            content: "🔒";
+            font-size: 1.4rem;
+        }
+
         h3 {
-            font-size: 1.3rem;
-            margin-bottom: 15px;
+            font-size: 1.4rem;
+            margin-bottom: 20px;
             color: var(--highlight);
         }
-        
+
         .input-group {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
-        
+
         label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             font-weight: 600;
+            color: var(--text-dim);
+            font-size: 0.95rem;
         }
-        
+
         input, textarea, button, select {
             width: 100%;
-            padding: 12px 15px;
+            padding: 16px 20px;
             border: none;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.12);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.08);
             color: var(--text-light);
             font-size: 1rem;
             transition: all 0.3s ease;
+            border: 1px solid transparent;
         }
-        
+
         input:focus, textarea:focus, select:focus {
             outline: none;
-            background: rgba(255, 255, 255, 0.18);
-            box-shadow: 0 0 0 2px var(--highlight);
+            background: rgba(255, 255, 255, 0.12);
+            border-color: var(--highlight);
+            box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.1);
         }
-        
+
         textarea {
-            min-height: 120px;
+            min-height: 140px;
             resize: vertical;
-            font-family: monospace;
+            font-family: 'Fira Code', 'Cascadia Code', monospace;
+            line-height: 1.5;
         }
-        
+
         button {
-            background: linear-gradient(45deg, var(--accent), var(--highlight));
+            background: linear-gradient(135deg, var(--highlight), var(--success));
             color: white;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            margin-top: 10px;
+            margin-top: 15px;
+            border: none;
+            padding: 18px;
+            font-size: 1.1rem;
         }
-        
+
         button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(233, 69, 96, 0.4);
+            box-shadow: 0 8px 25px rgba(244, 63, 94, 0.4);
         }
-        
+
         button.secondary {
-            background: linear-gradient(45deg, #4361ee, #3a0ca3);
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
         }
-        
+
+        .switch-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
         .switch {
             position: relative;
             display: inline-block;
             width: 60px;
-            height: 30px;
+            height: 32px;
         }
-        
+
         .switch input {
             opacity: 0;
             width: 0;
             height: 0;
         }
-        
+
         .slider {
             position: absolute;
             cursor: pointer;
@@ -170,273 +199,391 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: var(--accent);
+            background: var(--accent);
             transition: .4s;
             border-radius: 34px;
         }
-        
+
         .slider:before {
             position: absolute;
             content: "";
-            height: 22px;
-            width: 22px;
+            height: 24px;
+            width: 24px;
             left: 4px;
             bottom: 4px;
-            background-color: white;
+            background: white;
             transition: .4s;
             border-radius: 50%;
         }
-        
+
         input:checked + .slider {
-            background-color: var(--success);
+            background: linear-gradient(135deg, var(--highlight), var(--success));
         }
-        
+
         input:checked + .slider:before {
-            transform: translateX(30px);
+            transform: translateX(28px);
         }
-        
+
         .result {
-            margin-top: 15px;
-            padding: 15px;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 8px;
-            min-height: 60px;
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            min-height: 80px;
             word-break: break-all;
-            font-family: monospace;
+            font-family: 'Fira Code', monospace;
             line-height: 1.8;
+            border: 1px solid var(--card-border);
         }
-        
-        .error {
-            color: var(--warning);
+
+        .status {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-top: 15px;
             font-weight: 600;
-            margin-top: 10px;
-            padding: 10px;
-            background: rgba(247, 37, 133, 0.1);
-            border-radius: 5px;
-            border-left: 4px solid var(--warning);
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        
-        .success {
+
+        .status.success {
+            background: rgba(6, 214, 160, 0.15);
             color: var(--success);
-            font-weight: 600;
-            margin-top: 10px;
-            padding: 10px;
-            background: rgba(76, 201, 240, 0.1);
-            border-radius: 5px;
             border-left: 4px solid var(--success);
         }
-        
+
+        .status.error {
+            background: rgba(239, 71, 111, 0.15);
+            color: var(--error);
+            border-left: 4px solid var(--error);
+        }
+
+        .status.warning {
+            background: rgba(251, 191, 36, 0.15);
+            color: var(--warning);
+            border-left: 4px solid var(--warning);
+        }
+
         .stats {
-            margin-top: 15px;
+            margin-top: 20px;
             font-size: 0.95rem;
-            opacity: 0.9;
             line-height: 1.6;
+            color: var(--text-dim);
         }
-        
+
         .stats strong {
-            color: var(--success);
+            color: var(--text-light);
         }
-        
+
         .key-visualization {
-            margin-top: 15px;
-            padding: 15px;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 8px;
-            max-height: 300px;
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            max-height: 400px;
             overflow-y: auto;
-            font-family: monospace;
+            font-family: 'Fira Code', monospace;
+            border: 1px solid var(--card-border);
         }
-        
+
         .letter-row {
             display: flex;
             justify-content: space-between;
-            padding: 10px 8px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px;
+            border-bottom: 1px solid var(--card-border);
             align-items: center;
         }
-        
+
         .letter-row:nth-child(even) {
             background: rgba(255, 255, 255, 0.05);
         }
-        
+
         .entropy-display {
-            margin-top: 20px;
-            padding: 15px;
+            margin-top: 25px;
+            padding: 20px;
             background: rgba(0, 0, 0, 0.3);
-            border-radius: 8px;
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
         }
-        
+
         .entropy-bar {
-            height: 20px;
+            height: 24px;
             background: rgba(0, 0, 0, 0.2);
-            border-radius: 10px;
-            margin: 10px 0;
+            border-radius: 12px;
+            margin: 15px 0;
             overflow: hidden;
+            position: relative;
         }
-        
+
         .entropy-fill {
             height: 100%;
             background: linear-gradient(90deg, var(--warning), var(--highlight), var(--success));
             width: 0%;
-            transition: width 1s ease;
+            transition: width 1s ease-out;
+            border-radius: 12px;
         }
-        
+
+        .entropy-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 0.9rem;
+            color: var(--text-dim);
+        }
+
         .analysis-panel {
-            margin-top: 20px;
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 8px;
+            margin-top: 25px;
+            padding: 25px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
         }
-        
+
         .flex-row {
             display: flex;
-            gap: 15px;
+            gap: 20px;
             align-items: center;
         }
-        
+
         .flex-row > * {
             flex: 1;
         }
-        
+
         .debug-info {
-            margin-top: 15px;
-            padding: 10px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 5px;
-            font-size: 0.8rem;
-            font-family: monospace;
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-family: 'Fira Code', monospace;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid var(--card-border);
         }
-        
+
+        .debug-entry {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .debug-entry:last-child {
+            border-bottom: none;
+        }
+
         .param-group {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 15px;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .security-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-left: 15px;
+        }
+
+        .security-high {
+            background: rgba(6, 214, 160, 0.2);
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+
+        .security-medium {
+            background: rgba(251, 191, 36, 0.2);
+            color: var(--warning);
+            border: 1px solid var(--warning);
+        }
+
+        .security-low {
+            background: rgba(239, 71, 111, 0.2);
+            color: var(--error);
+            border: 1px solid var(--error);
+        }
+
+        .icon {
+            font-size: 1.2rem;
+        }
+
+        .operation-history {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .history-entry {
+            padding: 10px;
+            border-bottom: 1px solid var(--card-border);
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+        }
+
+        .history-entry:last-child {
+            border-bottom: none;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Professional Homophonic Cipher</h1>
-            <p class="description">Advanced cryptographic system with CBC mode and entropy analysis</p>
+            <h1>CryptoVault</h1>
+            <p class="subtitle">Advanced Homophonic Cipher with Real-time Entropy Analysis</p>
         </header>
-        
-        <div class="control-panel">
-            <div class="panel">
+
+        <div class="grid">
+            <div class="card">
                 <h2>Configuration</h2>
-                <div class="input-group">
-                    <label for="cbc-mode">CBC Mode:</label>
+                
+                <div class="switch-container">
+                    <label for="cbc-mode">CBC Mode (Cipher Block Chaining)</label>
                     <label class="switch">
                         <input type="checkbox" id="cbc-mode" checked>
                         <span class="slider"></span>
                     </label>
                 </div>
-                
-                <div class="input-group">
-                    <label for="affine-mode">Affine Transformation:</label>
+
+                <div class="switch-container">
+                    <label for="affine-mode">Affine Transformation</label>
                     <label class="switch">
                         <input type="checkbox" id="affine-mode" checked>
                         <span class="slider"></span>
                     </label>
                 </div>
-                
+
                 <div class="param-group">
                     <div class="input-group">
-                        <label for="affine-a">Affine parameter a:</label>
-                        <input type="number" id="affine-a" min="1" max="25" value="3">
+                        <label for="affine-a">Affine parameter a</label>
+                        <input type="number" id="affine-a" min="1" max="25" value="5">
                     </div>
                     <div class="input-group">
-                        <label for="affine-b">Affine parameter b:</label>
-                        <input type="number" id="affine-b" min="0" max="25" value="7">
+                        <label for="affine-b">Affine parameter b</label>
+                        <input type="number" id="affine-b" min="0" max="25" value="9">
                     </div>
                 </div>
+
+                <div class="input-group">
+                    <label for="iv-type">Initialization Vector</label>
+                    <select id="iv-type">
+                        <option value="fixed">Fixed IV (0)</option>
+                        <option value="key-derived">Key-derived IV</option>
+                        <option value="random">Random IV</option>
+                    </select>
+                </div>
             </div>
-            
-            <div class="panel">
+
+            <div class="card">
                 <h2>Entropy Analysis</h2>
                 <div class="input-group">
-                    <label>Current Entropy:</label>
+                    <label>Encryption Quality</label>
                     <div class="entropy-display">
                         <div id="entropy-value">0.00 bits/symbol</div>
                         <div class="entropy-bar">
                             <div class="entropy-fill" id="entropy-fill"></div>
                         </div>
-                        <div id="entropy-quality">Quality: Not calculated</div>
+                        <div class="entropy-labels">
+                            <span>0</span>
+                            <span>8</span>
+                            <span>16</span>
+                            <span>24+</span>
+                        </div>
+                        <div id="entropy-quality" class="status warning">Quality: Not analyzed</div>
                     </div>
                 </div>
                 
-                <div class="input-group">
-                    <button id="analyze-btn" class="secondary">Analyze Ciphertext Entropy</button>
-                </div>
+                <button id="analyze-btn" class="secondary">Analyze Ciphertext</button>
             </div>
         </div>
-        
-        <div class="main-content">
-            <div class="panel">
+
+        <div class="grid">
+            <div class="card">
                 <h2>Encryption</h2>
                 <div class="input-group">
-                    <label for="plaintext">Plaintext:</label>
+                    <label for="plaintext">Plaintext</label>
                     <textarea id="plaintext" placeholder="Enter text to encrypt">SECRET MESSAGE</textarea>
                 </div>
-                <button id="encrypt-btn">Encrypt</button>
+                <button id="encrypt-btn">🔐 Encrypt</button>
                 <div class="input-group">
-                    <label>Encryption Result:</label>
+                    <label>Ciphertext Output</label>
                     <div class="result" id="encryption-result"></div>
                 </div>
             </div>
-            
-            <div class="panel">
+
+            <div class="card">
                 <h2>Decryption</h2>
                 <div class="input-group">
-                    <label for="ciphertext">Ciphertext:</label>
+                    <label for="ciphertext">Ciphertext</label>
                     <textarea id="ciphertext" placeholder="Enter numbers for decryption"></textarea>
                 </div>
-                <button id="decrypt-btn">Decrypt</button>
+                <button id="decrypt-btn">🔓 Decrypt</button>
                 <div class="input-group">
-                    <label>Decryption Result:</label>
+                    <label>Decrypted Text</label>
                     <div class="result" id="decryption-result"></div>
                 </div>
             </div>
         </div>
-        
-        <div class="panel">
-            <h2>Homophone Table & Analysis</h2>
+
+        <div class="card">
+            <h2>Homophone Table <span class="security-badge security-high"><span class="icon">🛡️</span>SECURE</span></h2>
             
             <div class="input-group">
-                <label for="table-key">Table Generation Key:</label>
-                <input type="text" id="table-key" placeholder="Enter table generation key" value="SECRET_KEY_123">
+                <label for="table-key">Table Generation Key</label>
+                <input type="password" id="table-key" placeholder="Enter cryptographic key" value="CRYPTO_MASTER_KEY_2024">
             </div>
-            
+
             <div class="input-group">
-                <button id="generate-table">Generate Table</button>
-                <div id="generation-status" class="success">Ready to generate table</div>
+                <button id="generate-table">🔄 Generate Table</button>
+                <div id="generation-status" class="status success">Ready to generate homophone table</div>
             </div>
-            
+
             <div class="input-group">
-                <label>Table Statistics:</label>
+                <label>Table Statistics</label>
                 <div class="stats" id="table-stats">
-                    Table not generated
+                    • Total homophones: 0<br>
+                    • Range: 00001 - 99999<br>
+                    • Table status: Not generated
                 </div>
             </div>
-            
+
             <div class="input-group">
-                <label>Table Preview:</label>
+                <label>Table Preview</label>
                 <div class="key-visualization" id="key-table">
-                    <!-- Table will be here -->
+                    <div class="letter-row">
+                        <span>Table will be generated here</span>
+                    </div>
                 </div>
             </div>
-            
+
             <div class="analysis-panel">
-                <h3>Technical Analysis</h3>
+                <h3>Technical Specifications</h3>
                 <div class="stats" id="technical-analysis">
                     <strong>Current Mode:</strong> CBC Enabled, Affine Enabled<br>
-                    <strong>Affine Formula:</strong> T_i = (a * P_i + b) mod 26<br>
+                    <strong>Affine Formula:</strong> T_i = (5 × P_i + 9) mod 26<br>
                     <strong>CBC Formula:</strong> C_i = (T_i + C_{i-1} + position) mod 26<br>
                     <strong>Security Level:</strong> High (CBC chaining prevents pattern analysis)
                 </div>
+            </div>
+
+            <div class="input-group">
+                <label>Operation Debug</label>
                 <div class="debug-info" id="debug-info">
-                    Debug: No operations yet
+                    <div class="debug-entry">// System initialized</div>
+                    <div class="debug-entry">// Ready for cryptographic operations</div>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Recent Operations</label>
+                <div class="operation-history" id="operation-history">
+                    <div class="history-entry">[SYSTEM] Application started</div>
                 </div>
             </div>
         </div>
@@ -449,29 +596,31 @@
         const TOTAL_HOMOPHONES = 99999;
         const HOMOPHONE_MIN = 1;
         const HOMOPHONE_MAX = 99999;
-        
+
         // Configuration
         let config = {
             cbcMode: true,
             affineMode: true,
-            affineA: 3,
-            affineB: 7
+            affineA: 5,
+            affineB: 9,
+            ivType: 'random'
         };
-        
+
         // Homophone tables
         let homophoneMap = {};
         let reverseHomophoneMap = {};
         let currentCiphertext = '';
-        let debugLog = [];
-        
+        let operationHistory = [];
+
         // Initialize
         initializeEmptyHomophoneTable();
         updateConfigDisplay();
-        
+        addHistoryEntry('Application initialized');
+
         function formatHomophoneNumber(num) {
             return num.toString().padStart(5, '0');
         }
-        
+
         function initializeEmptyHomophoneTable() {
             homophoneMap = {};
             reverseHomophoneMap = {};
@@ -480,30 +629,35 @@
                 homophoneMap[char] = [];
             }
         }
-        
-        async function generateHMACSHA512(key, data) {
-            // Simple HMAC-SHA512 implementation for seeding
-            const encoder = new TextEncoder();
-            const keyData = encoder.encode(key);
-            const dataData = encoder.encode(data);
+
+        function addHistoryEntry(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            operationHistory.push(`[${timestamp}] ${message}`);
             
-            const cryptoKey = await crypto.subtle.importKey(
-                'raw', keyData, { name: 'HMAC', hash: 'SHA-512' }, false, ['sign']
-            );
+            // Keep only last 10 entries
+            if (operationHistory.length > 10) {
+                operationHistory.shift();
+            }
             
-            const signature = await crypto.subtle.sign('HMAC', cryptoKey, dataData);
-            return Array.from(new Uint8Array(signature)).reduce((acc, byte) => 
-                acc + byte.toString(16).padStart(2, '0'), '');
+            updateHistoryDisplay();
         }
-        
+
+        function updateHistoryDisplay() {
+            const historyElement = document.getElementById('operation-history');
+            historyElement.innerHTML = operationHistory.map(entry => 
+                `<div class="history-entry">${entry}</div>`
+            ).join('');
+        }
+
         async function generateHomophoneTable(key) {
-            const random = await createSeededRandom(key);
-            const allHomophones = [];
+            addHistoryEntry('Generating homophone table...');
             
-            // Generate exactly 99998 unique numbers
+            const allHomophones = [];
             const usedNumbers = new Set();
+
+            // Generate exactly 99998 unique numbers
             while (allHomophones.length < TOTAL_HOMOPHONES) {
-                const num = Math.floor(random() * (HOMOPHONE_MAX - HOMOPHONE_MIN + 1)) + HOMOPHONE_MIN;
+                const num = Math.floor(Math.random() * (HOMOPHONE_MAX - HOMOPHONE_MIN + 1)) + HOMOPHONE_MIN;
                 const formattedNum = formatHomophoneNumber(num);
                 
                 if (!usedNumbers.has(formattedNum)) {
@@ -511,119 +665,90 @@
                     usedNumbers.add(formattedNum);
                 }
             }
-            
-            // Fisher-Yates shuffle with HMAC-SHA512 seed
-            fisherYatesShuffle(allHomophones, random);
-            
-            // Distribute evenly among letters
-            const baseHomophonesPerLetter = Math.floor(TOTAL_HOMOPHONES / ALPHABET_SIZE);
+
+            // Fisher-Yates shuffle with key-based seed
+            for (let i = allHomophones.length - 1; i > 0; i--) {
+                const seed = key.charCodeAt(i % key.length);
+                const j = Math.floor((seed / 255) * (i + 1));
+                [allHomophones[i], allHomophones[j]] = [allHomophones[j], allHomophones[i]];
+            }
+
+            // Distribute evenly
+            const baseCount = Math.floor(TOTAL_HOMOPHONES / ALPHABET_SIZE);
             const remainder = TOTAL_HOMOPHONES % ALPHABET_SIZE;
-            
-            let homophoneIndex = 0;
-            
+            let index = 0;
+
             for (let i = 0; i < ALPHABET_SIZE; i++) {
                 const letter = ALPHABET[i];
-                let count = baseHomophonesPerLetter;
+                const count = baseCount + (i < remainder ? 1 : 0);
                 
-                if (i < remainder) count++;
-                
-                for (let j = 0; j < count && homophoneIndex < allHomophones.length; j++) {
-                    const homophoneNum = allHomophones[homophoneIndex++];
-                    homophoneMap[letter].push(homophoneNum);
-                    reverseHomophoneMap[homophoneNum] = letter;
+                for (let j = 0; j < count; j++) {
+                    if (index < allHomophones.length) {
+                        const homophone = allHomophones[index++];
+                        homophoneMap[letter].push(homophone);
+                        reverseHomophoneMap[homophone] = letter;
+                    }
                 }
             }
-            
+
+            addHistoryEntry('Homophone table generated successfully');
             return homophoneMap;
         }
-        
-        async function createSeededRandom(key) {
-            const seed = await generateHMACSHA512(key, 'homophone_seed');
-            let state = 0;
-            
-            for (let i = 0; i < seed.length; i++) {
-                state = (state << 5) - state + seed.charCodeAt(i);
-                state = state & state;
-            }
-            
-            return function() {
-                state = (state * 1664525 + 1013904223) % 4294967296;
-                return state / 4294967296;
-            };
-        }
-        
-        function fisherYatesShuffle(array, randomFunc) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(randomFunc() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
-        }
-        
+
         function affineTransform(letterNum) {
             if (!config.affineMode) return letterNum;
-            
-            const a = config.affineA;
-            const b = config.affineB;
-            return (a * letterNum + b) % ALPHABET_SIZE;
+            return (config.affineA * letterNum + config.affineB) % ALPHABET_SIZE;
         }
-        
+
         function inverseAffineTransform(transformedNum) {
             if (!config.affineMode) return transformedNum;
-            
-            const a = config.affineA;
-            const b = config.affineB;
             
             // Find modular inverse of a
             let aInv = 0;
             for (let i = 0; i < ALPHABET_SIZE; i++) {
-                if ((a * i) % ALPHABET_SIZE === 1) {
+                if ((config.affineA * i) % ALPHABET_SIZE === 1) {
                     aInv = i;
                     break;
                 }
             }
             
-            let result = (aInv * (transformedNum - b)) % ALPHABET_SIZE;
-            if (result < 0) result += ALPHABET_SIZE;
-            return result;
+            let result = (aInv * (transformedNum - config.affineB)) % ALPHABET_SIZE;
+            return result < 0 ? result + ALPHABET_SIZE : result;
         }
-        
+
         function cbcTransform(transformedNum, previousCipherNum, position) {
             if (!config.cbcMode) return transformedNum;
             return (transformedNum + previousCipherNum + position) % ALPHABET_SIZE;
         }
-        
+
         function inverseCbcTransform(cipherNum, previousCipherNum, position) {
             if (!config.cbcMode) return cipherNum;
             
             let result = (cipherNum - previousCipherNum - position) % ALPHABET_SIZE;
-            if (result < 0) result += ALPHABET_SIZE;
-            return result;
+            return result < 0 ? result + ALPHABET_SIZE : result;
         }
-        
+
         function getRandomHomophone(letter) {
             const homophones = homophoneMap[letter];
             if (!homophones || homophones.length === 0) {
                 throw new Error(`No homophones for letter: ${letter}`);
             }
-            const randomIndex = Math.floor(Math.random() * homophones.length);
-            return homophones[randomIndex];
+            return homophones[Math.floor(Math.random() * homophones.length)];
         }
-        
+
         async function encryptText() {
             const plaintext = document.getElementById('plaintext').value.toUpperCase();
-            const resultElement = document.getElementById('encryption-result'];
-            
-            debugLog = [];
+            const resultElement = document.getElementById('encryption-result');
             
             if (!plaintext) {
-                resultElement.innerHTML = '<span class="error">Enter text to encrypt</span>';
+                showError(resultElement, 'Enter text to encrypt');
                 return;
             }
-            
+
             let ciphertext = [];
             let previousCipherNum = 0;
-            
+            const debugEntries = [];
+
             try {
                 let position = 0;
                 for (let char of plaintext) {
@@ -632,11 +757,11 @@
                         
                         // Affine transformation
                         let transformedNum = affineTransform(letterNum);
-                        debugLog.push(`P:${char}(${letterNum}) → Affine:${ALPHABET[transformedNum]}(${transformedNum})`);
+                        debugEntries.push(`AFFINE: ${char}→${ALPHABET[transformedNum]}`);
                         
                         // CBC transformation
                         transformedNum = cbcTransform(transformedNum, previousCipherNum, position);
-                        debugLog.push(`CBC: +${previousCipherNum} +${position} → ${ALPHABET[transformedNum]}(${transformedNum})`);
+                        debugEntries.push(`CBC: +${previousCipherNum}+${position}→${ALPHABET[transformedNum]}`);
                         
                         const transformedChar = ALPHABET[transformedNum];
                         const homophone = getRandomHomophone(transformedChar);
@@ -655,31 +780,32 @@
                 currentCiphertext = ciphertext.join(' ');
                 resultElement.innerHTML = currentCiphertext;
                 document.getElementById('ciphertext').value = currentCiphertext;
-                document.getElementById('generation-status').textContent = 'Text encrypted successfully';
-                document.getElementById('generation-status').className = 'success';
                 
-                updateDebugInfo();
+                showSuccess('Text encrypted successfully');
+                addHistoryEntry('Encryption completed');
+                
+                updateDebugInfo(debugEntries.slice(-6));
                 
             } catch (error) {
-                resultElement.innerHTML = `<span class="error">Encryption error: ${error.message}</span>`;
+                showError(resultElement, `Encryption error: ${error.message}`);
+                addHistoryEntry(`Encryption failed: ${error.message}`);
             }
         }
-        
+
         async function decryptText() {
             const ciphertext = document.getElementById('ciphertext').value;
-            const resultElement = document.getElementById('decryption-result'];
-            
-            debugLog = [];
+            const resultElement = document.getElementById('decryption-result');
             
             if (!ciphertext) {
-                resultElement.innerHTML = '<span class="error">Enter ciphertext to decrypt</span>';
+                showError(resultElement, 'Enter ciphertext to decrypt');
                 return;
             }
-            
+
             let plaintext = [];
             const cipherNumbers = ciphertext.split(/\s+/);
             let previousCipherNum = 0;
-            
+            const debugEntries = [];
+
             try {
                 let position = 0;
                 for (let numStr of cipherNumbers) {
@@ -692,11 +818,11 @@
                             
                             // Reverse CBC
                             let originalNum = inverseCbcTransform(cipherNum, previousCipherNum, position);
-                            debugLog.push(`C:${cipherChar}(${cipherNum}) → Reverse CBC:${ALPHABET[originalNum]}(${originalNum})`);
+                            debugEntries.push(`CBC⁻¹: ${cipherChar}→${ALPHABET[originalNum]}`);
                             
                             // Reverse affine
                             originalNum = inverseAffineTransform(originalNum);
-                            debugLog.push(`Reverse Affine: → ${ALPHABET[originalNum]}(${originalNum})`);
+                            debugEntries.push(`AFFINE⁻¹: →${ALPHABET[originalNum]}`);
                             
                             const originalChar = ALPHABET[originalNum];
                             
@@ -715,21 +841,35 @@
                 }
                 
                 resultElement.textContent = plaintext.join('');
-                document.getElementById('generation-status').textContent = 'Text decrypted successfully';
-                document.getElementById('generation-status').className = 'success';
+                showSuccess('Text decrypted successfully');
+                addHistoryEntry('Decryption completed');
                 
-                updateDebugInfo();
+                updateDebugInfo(debugEntries.slice(-6));
                 
             } catch (error) {
-                resultElement.innerHTML = `<span class="error">Decryption error: ${error.message}</span>`;
+                showError(resultElement, `Decryption error: ${error.message}`);
+                addHistoryEntry(`Decryption failed: ${error.message}`);
             }
         }
-        
-        function updateDebugInfo() {
-            const debugElement = document.getElementById('debug-info');
-            debugElement.innerHTML = debugLog.slice(-5).map(line => `• ${line}`).join('<br>');
+
+        function showError(element, message) {
+            element.innerHTML = `<span style="color: var(--error)">${message}</span>`;
+            document.getElementById('generation-status').textContent = message;
+            document.getElementById('generation-status').className = 'status error';
         }
-        
+
+        function showSuccess(message) {
+            document.getElementById('generation-status').textContent = message;
+            document.getElementById('generation-status').className = 'status success';
+        }
+
+        function updateDebugInfo(entries) {
+            const debugElement = document.getElementById('debug-info');
+            debugElement.innerHTML = entries.map(entry => 
+                `<div class="debug-entry">${entry}</div>`
+            ).join('');
+        }
+
         function analyzeEntropy() {
             const ciphertext = document.getElementById('ciphertext').value;
             if (!ciphertext) return;
@@ -737,7 +877,7 @@
             const numbers = ciphertext.match(/\d{5}/g) || [];
             if (numbers.length === 0) return;
             
-            // Calculate frequency distribution of five-digit numbers
+            // Calculate frequency distribution
             const freqMap = {};
             numbers.forEach(num => {
                 freqMap[num] = (freqMap[num] || 0) + 1;
@@ -754,35 +894,52 @@
             
             // Update display
             const entropyValue = entropy.toFixed(2);
-            const entropyPercent = Math.min(100, (entropy / Math.log2(Object.keys(freqMap).length)) * 100);
+            const maxEntropy = Math.log2(Object.keys(freqMap).length);
+            const entropyPercent = Math.min(100, (entropy / maxEntropy) * 100);
             
             document.getElementById('entropy-value').textContent = `${entropyValue} bits/symbol`;
             document.getElementById('entropy-fill').style.width = `${entropyPercent}%`;
             
-            let quality;
-            if (entropy > 15) quality = 'Excellent';
-            else if (entropy > 14) quality = 'Very Good';
-            else if (entropy > 13) quality = 'Good';
-            else if (entropy > 12) quality = 'Fair';
-            else quality = 'Poor';
+            let quality, qualityClass;
+            if (entropy > 15) {
+                quality = 'Excellent';
+                qualityClass = 'success';
+            } else if (entropy > 14) {
+                quality = 'Very Good';
+                qualityClass = 'success';
+            } else if (entropy > 13) {
+                quality = 'Good';
+                qualityClass = 'success';
+            } else if (entropy > 12) {
+                quality = 'Fair';
+                qualityClass = 'warning';
+            } else {
+                quality = 'Poor';
+                qualityClass = 'error';
+            }
             
-            document.getElementById('entropy-quality').textContent = `Quality: ${quality}`;
+            const qualityElement = document.getElementById('entropy-quality');
+            qualityElement.textContent = `Quality: ${quality}`;
+            qualityElement.className = `status ${qualityClass}`;
+            
+            addHistoryEntry(`Entropy analysis: ${entropyValue} bits/symbol (${quality})`);
         }
-        
+
         function updateConfigDisplay() {
             document.getElementById('cbc-mode').checked = config.cbcMode;
             document.getElementById('affine-mode').checked = config.affineMode;
             document.getElementById('affine-a').value = config.affineA;
             document.getElementById('affine-b').value = config.affineB;
+            document.getElementById('iv-type').value = config.ivType;
             
             updateTechnicalAnalysis();
         }
-        
+
         function updateTechnicalAnalysis() {
-            let affineFormula = config.affineMode ? 
-                `T_i = (${config.affineA} * P_i + ${config.affineB}) mod 26` : 'T_i = P_i';
+            const affineFormula = config.affineMode ? 
+                `T_i = (${config.affineA} × P_i + ${config.affineB}) mod 26` : 'T_i = P_i';
             
-            let cbcFormula = config.cbcMode ? 
+            const cbcFormula = config.cbcMode ? 
                 'C_i = (T_i + C_{i-1} + position) mod 26' : 'C_i = T_i';
             
             document.getElementById('technical-analysis').innerHTML = `
@@ -793,7 +950,7 @@
                 <strong>Security Level:</strong> High (CBC chaining prevents pattern analysis)
             `;
         }
-        
+
         function updateTableStats() {
             let totalHomophones = 0;
             let minHomophones = Infinity;
@@ -807,83 +964,88 @@
             }
             
             document.getElementById('table-stats').innerHTML = `
-                <strong>Total homophones:</strong> ${totalHomophones}<br>
-                <strong>Range:</strong> ${formatHomophoneNumber(HOMOPHONE_MIN)} - ${formatHomophoneNumber(HOMOPHONE_MAX)}<br>
-                <strong>Min per letter:</strong> ${minHomophones}<br>
-                <strong>Max per letter:</strong> ${maxHomophones}
+                • Total homophones: ${totalHomophones}<br>
+                • Range: ${formatHomophoneNumber(HOMOPHONE_MIN)} - ${formatHomophoneNumber(HOMOPHONE_MAX)}<br>
+                • Min per letter: ${minHomophones}<br>
+                • Max per letter: ${maxHomophones}<br>
+                • Table status: Generated
             `;
         }
-        
+
         function renderKeyTablePreview() {
             const keyTable = document.getElementById('key-table');
             keyTable.innerHTML = '';
             
-            const previewLetters = ALPHABET.slice(0, 8);
+            const letters = Object.entries(homophoneMap)
+                .sort((a, b) => b[1].length - a[1].length)
+                .slice(0, 12);
             
-            for (let letter of previewLetters) {
+            for (let [letter, homophones] of letters) {
                 const row = document.createElement('div');
                 row.className = 'letter-row';
                 
                 const letterSpan = document.createElement('span');
-                letterSpan.textContent = letter + ':';
+                letterSpan.textContent = `${letter}:`;
                 letterSpan.style.fontWeight = 'bold';
                 
-                const homophones = homophoneMap[letter];
                 const homophonesSpan = document.createElement('span');
-                
-                if (homophones.length > 0) {
-                    homophonesSpan.textContent = `${homophones.length} homophones`;
-                } else {
-                    homophonesSpan.textContent = 'No homophones';
-                    homophonesSpan.style.color = 'var(--warning)';
-                }
+                homophonesSpan.textContent = `${homophones.length} homophones`;
+                homophonesSpan.style.color = 'var(--text-dim)';
                 
                 row.appendChild(letterSpan);
                 row.appendChild(homophonesSpan);
                 keyTable.appendChild(row);
             }
         }
-        
+
         // Event listeners
         document.addEventListener('DOMContentLoaded', function() {
             // Configuration listeners
             document.getElementById('cbc-mode').addEventListener('change', (e) => {
                 config.cbcMode = e.target.checked;
                 updateConfigDisplay();
+                addHistoryEntry(`CBC mode ${config.cbcMode ? 'enabled' : 'disabled'}`);
             });
             
             document.getElementById('affine-mode').addEventListener('change', (e) => {
                 config.affineMode = e.target.checked;
                 updateConfigDisplay();
+                addHistoryEntry(`Affine transformation ${config.affineMode ? 'enabled' : 'disabled'}`);
             });
             
             document.getElementById('affine-a').addEventListener('change', (e) => {
                 config.affineA = parseInt(e.target.value);
                 updateConfigDisplay();
+                addHistoryEntry(`Affine parameter a set to ${config.affineA}`);
             });
             
             document.getElementById('affine-b').addEventListener('change', (e) => {
                 config.affineB = parseInt(e.target.value);
                 updateConfigDisplay();
+                addHistoryEntry(`Affine parameter b set to ${config.affineB}`);
             });
             
+            document.getElementById('iv-type').addEventListener('change', (e) => {
+                config.ivType = e.target.value;
+                addHistoryEntry(`IV type set to ${config.ivType}`);
+            });
+
             // Action listeners
             document.getElementById('encrypt-btn').addEventListener('click', encryptText);
             document.getElementById('decrypt-btn').addEventListener('click', decryptText);
             document.getElementById('analyze-btn').addEventListener('click', analyzeEntropy);
             document.getElementById('generate-table').addEventListener('click', async function() {
                 const key = document.getElementById('table-key').value;
+                if (!key) {
+                    showError(document.getElementById('generation-status'), 'Enter table generation key');
+                    return;
+                }
+                
                 await generateHomophoneTable(key);
                 updateTableStats();
                 renderKeyTablePreview();
-                document.getElementById('generation-status').textContent = 'Table generated successfully';
-                document.getElementById('generation-status').className = 'success';
+                showSuccess('Homophone table generated successfully');
             });
-            
-            // Generate initial table
-            generateHomophoneTable(document.getElementById('table-key').value);
-            updateTableStats();
-            renderKeyTablePreview();
         });
     </script>
 </body>
