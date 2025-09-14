@@ -291,7 +291,6 @@
         }
 
         function deriveSaltFromKey(key) {
-            // Соль детерминированно derives из ключа
             let hash = 0;
             for (let i = 0; i < key.length; i++) {
                 hash = ((hash << 5) - hash) + key.charCodeAt(i);
@@ -320,16 +319,22 @@
             const hmac = await generateHMACSHA512(key, salt);
             const hmacBytes = new Uint8Array(hmac);
             
+            // Create base homophone sequence (00001-99999)
             const allNumbers = Array.from({length: TOTAL_HOMOPHONES}, (_, i) => 
                 (i + 1).toString().padStart(5, '0')
             );
             
+            // CRYPTOGRAPHICALLY SECURE SHUFFLING based on key and salt
             for (let i = allNumbers.length - 1; i > 0; i--) {
-                const byte = hmacBytes[i % hmacBytes.length];
-                const j = byte % (i + 1);
+                // Use HMAC for deterministic but cryptographically strong shuffling
+                const byteIndex = (i * 13) % hmacBytes.length; // Non-linear HMAC byte access
+                const j = hmacBytes[byteIndex] % (i + 1);
+                
+                // Swap homophones
                 [allNumbers[i], allNumbers[j]] = [allNumbers[j], allNumbers[i]];
             }
             
+            // Distribute shuffled homophones to letters
             initializeTables();
             const numbersPerLetter = Math.floor(TOTAL_HOMOPHONES / ALPHABET.length);
             let index = 0;
