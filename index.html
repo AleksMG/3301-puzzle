@@ -324,13 +324,14 @@
                 (i + 1).toString().padStart(5, '0')
             );
             
-            // CRYPTOGRAPHICALLY SECURE SHUFFLING based on key and salt
+            // Proper Fisher-Yates shuffle with HMAC as entropy source
             for (let i = allNumbers.length - 1; i > 0; i--) {
-                // Use HMAC for deterministic but cryptographically strong shuffling
-                const byteIndex = (i * 13) % hmacBytes.length; // Non-linear HMAC byte access
-                const j = hmacBytes[byteIndex] % (i + 1);
+                // Generate cryptographically strong random index using HMAC
+                const randomBuffer = await generateHMACSHA512(key + salt, i.toString());
+                const randomArray = new Uint32Array(randomBuffer);
+                const j = randomArray[0] % (i + 1);
                 
-                // Swap homophones
+                // Swap elements using Fisher-Yates
                 [allNumbers[i], allNumbers[j]] = [allNumbers[j], allNumbers[i]];
             }
             
