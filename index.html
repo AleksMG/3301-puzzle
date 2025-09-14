@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NeonHomophone Cipher</title>
+    <title>NeonHomophone Cipher | Professional Edition</title>
     <style>
         :root {
             --background: #0a0a12;
@@ -21,13 +21,13 @@
             --terminal: #0f0f1f;
             --terminal-border: #2a2a55;
             --glow: 0 0 10px var(--accent);
+            --transition: all 0.3s ease;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Fira Code', 'Cascadia Code', monospace;
         }
 
         body {
@@ -36,6 +36,8 @@
             min-height: 100vh;
             padding: 20px;
             line-height: 1.6;
+            font-family: 'Fira Code', 'Cascadia Code', monospace;
+            overflow-x: hidden;
         }
 
         .container {
@@ -54,6 +56,32 @@
             border-radius: 16px;
             border: 1px solid var(--primary);
             box-shadow: var(--glow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent,
+                rgba(138, 43, 226, 0.1),
+                rgba(0, 191, 255, 0.1),
+                transparent
+            );
+            transform: rotate(45deg);
+            animation: shimmer 10s infinite linear;
+            pointer-events: none;
+        }
+
+        @keyframes shimmer {
+            0% { transform: rotate(45deg) translateX(-50%); }
+            100% { transform: rotate(45deg) translateX(50%); }
         }
 
         h1 {
@@ -65,6 +93,8 @@
             color: transparent;
             text-shadow: 0 0 15px rgba(0, 191, 255, 0.5);
             letter-spacing: 1px;
+            position: relative;
+            z-index: 1;
         }
 
         .header-desc {
@@ -72,6 +102,8 @@
             font-size: 1.1rem;
             max-width: 700px;
             margin: 0 auto;
+            position: relative;
+            z-index: 1;
         }
 
         .grid-system {
@@ -86,12 +118,30 @@
             border-radius: 16px;
             border: 1px solid var(--primary);
             box-shadow: 0 0 20px rgba(138, 43, 226, 0.2);
-            transition: all 0.3s ease;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            opacity: 0.7;
+            transition: var(--transition);
         }
 
         .card:hover {
             box-shadow: 0 0 25px rgba(138, 43, 226, 0.3);
-            transform: translateY(-2px);
+            transform: translateY(-5px);
+        }
+
+        .card:hover::after {
+            opacity: 1;
         }
 
         h2 {
@@ -132,7 +182,7 @@
             color: var(--text);
             font-size: 1rem;
             border: 1px solid var(--primary);
-            transition: all 0.3s ease;
+            transition: var(--transition);
         }
 
         input:focus, textarea:focus, select:focus {
@@ -154,12 +204,13 @@
             cursor: pointer;
             border: none;
             margin-top: 15px;
-            transition: all 0.3s ease;
+            transition: var(--transition);
             letter-spacing: 0.5px;
             text-transform: uppercase;
             font-size: 0.9rem;
             position: relative;
             overflow: hidden;
+            z-index: 1;
         }
 
         button::before {
@@ -171,6 +222,7 @@
             height: 100%;
             background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
             transition: 0.5s;
+            z-index: -1;
         }
 
         button:hover::before {
@@ -191,6 +243,15 @@
             background: var(--surface-alt);
             border-radius: 10px;
             border: 1px solid var(--primary);
+        }
+
+        .switch label {
+            margin-bottom: 0;
+        }
+
+        .switch input[type="checkbox"] {
+            width: auto;
+            transform: scale(1.5);
         }
 
         .result {
@@ -321,6 +382,78 @@
             color: var(--accent);
             font-weight: 600;
         }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            border-bottom: 1px dotted var(--text-dim);
+            cursor: help;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: var(--surface-alt);
+            color: var(--text);
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.8rem;
+            border: 1px solid var(--primary);
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            background: var(--surface);
+            color: var(--text);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transform: translateX(150%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            border-left: 4px solid var(--primary);
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .char-counter {
+            text-align: right;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            margin-top: 5px;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: var(--accent);
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -335,22 +468,30 @@
                 <h2>CONFIGURATION</h2>
                 
                 <div class="switch">
-                    <label for="cbc-mode">CBC Mode</label>
+                    <label for="cbc-mode" class="tooltip">CBC Mode
+                        <span class="tooltiptext">Cipher Block Chaining adds diffusion by chaining cipher blocks</span>
+                    </label>
                     <input type="checkbox" id="cbc-mode" checked>
                 </div>
 
                 <div class="switch">
-                    <label for="affine-mode">Affine Transformation</label>
+                    <label for="affine-mode" class="tooltip">Affine Transformation
+                        <span class="tooltiptext">Applies mathematical transformation to each character</span>
+                    </label>
                     <input type="checkbox" id="affine-mode" checked>
                 </div>
 
                 <div class="input-group">
-                    <label for="affine-a">Affine Parameter A</label>
+                    <label for="affine-a" class="tooltip">Affine Parameter A
+                        <span class="tooltiptext">Must be coprime with 26 (alphabet size)</span>
+                    </label>
                     <input type="number" id="affine-a" min="1" max="25" value="5">
                 </div>
 
                 <div class="input-group">
-                    <label for="affine-b">Affine Parameter B</label>
+                    <label for="affine-b" class="tooltip">Affine Parameter B
+                        <span class="tooltiptext">Shift value for the affine transformation</span>
+                    </label>
                     <input type="number" id="affine-b" min="0" max="25" value="9">
                 </div>
             </div>
@@ -361,14 +502,20 @@
                 <div class="input-group">
                     <label for="crypto-key">Password</label>
                     <input type="password" id="crypto-key" value="MILITARY_GRADE_KEY_2024">
+                    <div class="char-counter"><span id="key-length">0</span> characters</div>
                 </div>
                 
                 <div class="input-group">
-                    <label for="key-iterations">PBKDF2 Iterations</label>
+                    <label for="key-iterations" class="tooltip">PBKDF2 Iterations
+                        <span class="tooltiptext">Higher values increase security but slow down processing</span>
+                    </label>
                     <input type="number" id="key-iterations" min="100000" max="1000000" value="600000">
                 </div>
 
-                <button id="generate-btn">GENERATE HOMOPHONE TABLE</button>
+                <button id="generate-btn">
+                    <span class="loading" id="generate-loading" style="display: none;"></span>
+                    GENERATE HOMOPHONE TABLE
+                </button>
                 
                 <div class="progress">
                     <div class="progress-bar" id="key-progress"></div>
@@ -393,7 +540,7 @@
                     </div>
                     <div class="key-value">
                         <span class="key">Security level:</span>
-                        <span class="value">256-bit</span>
+                        <span class="value" id="security-level">256-bit</span>
                     </div>
                 </div>
             </div>
@@ -405,14 +552,19 @@
                 
                 <div class="input-group">
                     <label for="plaintext">Plaintext</label>
-                    <textarea id="plaintext">TOP SECRET MESSAGE</textarea>
+                    <textarea id="plaintext" placeholder="Enter text to encrypt">TOP SECRET MESSAGE</textarea>
+                    <div class="char-counter"><span id="plaintext-length">0</span> characters</div>
                 </div>
 
-                <button id="encrypt-btn">ENCRYPT</button>
+                <button id="encrypt-btn">
+                    <span class="loading" id="encrypt-loading" style="display: none;"></span>
+                    ENCRYPT
+                </button>
 
                 <div class="input-group">
                     <label>Ciphertext</label>
                     <div class="result" id="encryption-result"></div>
+                    <div class="char-counter"><span id="ciphertext-length">0</span> homophones</div>
                 </div>
             </div>
 
@@ -421,18 +573,25 @@
                 
                 <div class="input-group">
                     <label for="ciphertext">Ciphertext</label>
-                    <textarea id="ciphertext"></textarea>
+                    <textarea id="ciphertext" placeholder="Enter homophones to decrypt (5-digit numbers separated by spaces)"></textarea>
+                    <div class="char-counter"><span id="ciphertext-input-length">0</span> homophones</div>
                 </div>
 
-                <button id="decrypt-btn">DECRYPT</button>
+                <button id="decrypt-btn">
+                    <span class="loading" id="decrypt-loading" style="display: none;"></span>
+                    DECRYPT
+                </button>
 
                 <div class="input-group">
                     <label>Decrypted Text</label>
                     <div class="result" id="decryption-result"></div>
+                    <div class="char-counter"><span id="decrypted-length">0</span> characters</div>
                 </div>
             </div>
         </div>
     </div>
+
+    <div class="notification" id="notification"></div>
 
     <script>
         // Constants
@@ -453,248 +612,313 @@
             affineB: 9
         };
 
-        // Initialize homophone tables
-        function initializeTables() {
-            homophoneTable = {};
-            reverseHomophoneTable = {};
-            
-            // Initialize empty arrays for each letter
-            for (let char of ALPHABET) {
-                homophoneTable[char] = [];
-            }
-        }
+        // DOM Elements cache
+        const elements = {
+            cbcMode: document.getElementById('cbc-mode'),
+            affineMode: document.getElementById('affine-mode'),
+            affineA: document.getElementById('affine-a'),
+            affineB: document.getElementById('affine-b'),
+            cryptoKey: document.getElementById('crypto-key'),
+            keyIterations: document.getElementById('key-iterations'),
+            generateBtn: document.getElementById('generate-btn'),
+            keyProgress: document.getElementById('key-progress'),
+            status: document.getElementById('status'),
+            plaintext: document.getElementById('plaintext'),
+            ciphertext: document.getElementById('ciphertext'),
+            encryptBtn: document.getElementById('encrypt-btn'),
+            decryptBtn: document.getElementById('decrypt-btn'),
+            encryptionResult: document.getElementById('encryption-result'),
+            decryptionResult: document.getElementById('decryption-result'),
+            securityLevel: document.getElementById('security-level'),
+            notification: document.getElementById('notification'),
+            // Loading indicators
+            generateLoading: document.getElementById('generate-loading'),
+            encryptLoading: document.getElementById('encrypt-loading'),
+            decryptLoading: document.getElementById('decrypt-loading'),
+            // Character counters
+            keyLength: document.getElementById('key-length'),
+            plaintextLength: document.getElementById('plaintext-length'),
+            ciphertextLength: document.getElementById('ciphertext-length'),
+            ciphertextInputLength: document.getElementById('ciphertext-input-length'),
+            decryptedLength: document.getElementById('decrypted-length')
+        };
 
-        // Derive key using PBKDF2 with SHA-512
-        async function deriveKey(password, iterations) {
-            const encoder = new TextEncoder();
-            const passwordBuffer = encoder.encode(password);
-            
-            // Import the password as a key
-            const keyMaterial = await crypto.subtle.importKey(
-                'raw',
-                passwordBuffer,
-                'PBKDF2',
-                false,
-                ['deriveBits']
-            );
-            
-            // Derive key using PBKDF2
-            const derivedBits = await crypto.subtle.deriveBits(
-                {
-                    name: 'PBKDF2',
-                    salt: SALT,
-                    iterations: iterations,
-                    hash: 'SHA-512'
-                },
-                keyMaterial,
-                512 // 512 bits
-            );
-            
-            return new Uint8Array(derivedBits);
-        }
-
-        // Generate cryptographically secure random values using HMAC-based DRBG
-        async function generateHMAC(key, data) {
-            const encoder = new TextEncoder();
-            const cryptoKey = await crypto.subtle.importKey(
-                'raw',
-                key,
-                { name: 'HMAC', hash: 'SHA-512' },
-                false,
-                ['sign']
-            );
-            const signature = await crypto.subtle.sign('HMAC', cryptoKey, encoder.encode(data));
-            return new Uint8Array(signature);
-        }
-
-        // HMAC-based deterministic shuffling algorithm
-        async function deterministicShuffle(array, key, salt) {
-            const result = [...array];
-            const n = result.length;
-            
-            // Use HMAC in counter mode for deterministic randomness
-            for (let i = n - 1; i > 0; i--) {
-                // Generate random index using HMAC
-                const counter = i.toString();
-                const hmacBytes = await generateHMAC(key, salt + counter);
+        // Utility functions
+        const utils = {
+            showNotification: (message, type = 'info') => {
+                elements.notification.textContent = message;
+                elements.notification.style.borderLeftColor = 
+                    type === 'error' ? 'var(--error)' : 
+                    type === 'success' ? 'var(--success)' : 'var(--primary)';
+                elements.notification.classList.add('show');
                 
-                // Convert to integer in range [0, i]
-                const randomValue = new DataView(hmacBytes.buffer).getUint32(0);
-                const j = randomValue % (i + 1);
+                setTimeout(() => {
+                    elements.notification.classList.remove('show');
+                }, 3000);
+            },
+            
+            setLoading: (button, isLoading) => {
+                const loadingElement = elements[`${button}Loading`];
+                if (loadingElement) {
+                    loadingElement.style.display = isLoading ? 'inline-block' : 'none';
+                }
                 
-                // Swap elements
-                [result[i], result[j]] = [result[j], result[i]];
-            }
+                elements[`${button}Btn`].disabled = isLoading;
+            },
             
-            return result;
-        }
+            updateCharCounter: (element, counterElement) => {
+                const length = element.value.length;
+                elements[counterElement].textContent = length;
+                return length;
+            },
+            
+            validateAffineParam: (a) => {
+                return utils.gcd(a, ALPHABET_SIZE) === 1;
+            },
+            
+            gcd: (a, b) => {
+                if (b === 0) return a;
+                return utils.gcd(b, a % b);
+            },
+            
+            // Modular inverse for affine cipher
+            modInverse: (a, m) => {
+                a = (a % m + m) % m;
+                for (let x = 1; x < m; x++) {
+                    if ((a * x) % m === 1) return x;
+                }
+                return 1;
+            }
+        };
 
-        // Generate homophone table based on derived key
-        async function generateHomophoneTable(password, iterations) {
-            if (!password || password.length === 0) {
-                throw new Error('Password is required');
+        // Homophone Cipher Class
+        class HomophoneCipher {
+            constructor() {
+                this.initializeTables();
             }
             
-            // Show progress
-            document.getElementById('key-progress').style.width = '30%';
-            document.getElementById('status').textContent = 'Deriving key with PBKDF2...';
-            document.getElementById('status').className = 'status success';
+            initializeTables() {
+                homophoneTable = {};
+                reverseHomophoneTable = {};
+                
+                // Initialize empty arrays for each letter
+                for (let char of ALPHABET) {
+                    homophoneTable[char] = [];
+                }
+            }
             
-            // Derive key using PBKDF2
-            derivedKey = await deriveKey(password, iterations);
-            document.getElementById('key-progress').style.width = '60%';
-            
-            // Convert derived key to hex string for salt
-            const keyHex = Array.from(derivedKey).map(b => b.toString(16).padStart(2, '0')).join('');
-            
-            // Initialize tables
-            initializeTables();
-            document.getElementById('status').textContent = 'Generating homophone table...';
-            
-            // Create all possible homophones (00001 to 99999)
-            const allHomophones = Array.from(
-                {length: TOTAL_HOMOPHONES}, 
-                (_, i) => (i + 1).toString().padStart(HOMOPHONE_LENGTH, '0')
-            );
-            
-            // Deterministic shuffle based on derived key
-            const shuffledHomophones = await deterministicShuffle(allHomophones, derivedKey, keyHex);
-            document.getElementById('key-progress').style.width = '90%';
-            
-            // Distribute homophones evenly among letters
-            const homophonesPerLetter = Math.floor(TOTAL_HOMOPHONES / ALPHABET_SIZE);
-            let homophoneIndex = 0;
-            
-            for (const letter of ALPHABET) {
-                // Assign homophones to this letter
-                homophoneTable[letter] = shuffledHomophones.slice(
-                    homophoneIndex, 
-                    homophoneIndex + homophonesPerLetter
+            // Derive key using PBKDF2 with SHA-512
+            async deriveKey(password, iterations) {
+                const encoder = new TextEncoder();
+                const passwordBuffer = encoder.encode(password);
+                
+                // Import the password as a key
+                const keyMaterial = await crypto.subtle.importKey(
+                    'raw',
+                    passwordBuffer,
+                    'PBKDF2',
+                    false,
+                    ['deriveBits']
                 );
                 
-                // Create reverse mapping
-                for (const homophone of homophoneTable[letter]) {
-                    reverseHomophoneTable[homophone] = letter;
+                // Derive key using PBKDF2
+                const derivedBits = await crypto.subtle.deriveBits(
+                    {
+                        name: 'PBKDF2',
+                        salt: SALT,
+                        iterations: iterations,
+                        hash: 'SHA-512'
+                    },
+                    keyMaterial,
+                    512 // 512 bits
+                );
+                
+                return new Uint8Array(derivedBits);
+            }
+            
+            // Generate cryptographically secure random values using HMAC-based DRBG
+            async generateHMAC(key, data) {
+                const encoder = new TextEncoder();
+                const cryptoKey = await crypto.subtle.importKey(
+                    'raw',
+                    key,
+                    { name: 'HMAC', hash: 'SHA-512' },
+                    false,
+                    ['sign']
+                );
+                const signature = await crypto.subtle.sign('HMAC', cryptoKey, encoder.encode(data));
+                return new Uint8Array(signature);
+            }
+            
+            // HMAC-based deterministic shuffling algorithm
+            async deterministicShuffle(array, key, salt) {
+                const result = [...array];
+                const n = result.length;
+                
+                // Use HMAC in counter mode for deterministic randomness
+                for (let i = n - 1; i > 0; i--) {
+                    // Generate random index using HMAC
+                    const counter = i.toString();
+                    const hmacBytes = await this.generateHMAC(key, salt + counter);
+                    
+                    // Convert to integer in range [0, i]
+                    const randomValue = new DataView(hmacBytes.buffer).getUint32(0);
+                    const j = randomValue % (i + 1);
+                    
+                    // Swap elements
+                    [result[i], result[j]] = [result[j], result[i]];
                 }
                 
-                homophoneIndex += homophonesPerLetter;
+                return result;
             }
             
-            // Distribute remaining homophones (if any)
-            const remainingHomophones = TOTAL_HOMOPHONES % ALPHABET_SIZE;
-            if (remainingHomophones > 0) {
-                const extraHomophones = shuffledHomophones.slice(-remainingHomophones);
+            // Generate homophone table based on derived key
+            async generateHomophoneTable(password, iterations, progressCallback = null) {
+                if (!password || password.length === 0) {
+                    throw new Error('Password is required');
+                }
                 
-                // Distribute extra homophones evenly
-                for (let i = 0; i < remainingHomophones; i++) {
-                    const letter = ALPHABET[i % ALPHABET_SIZE];
-                    homophoneTable[letter].push(extraHomophones[i]);
-                    reverseHomophoneTable[extraHomophones[i]] = letter;
+                if (progressCallback) progressCallback(30, 'Deriving key with PBKDF2...');
+                
+                // Derive key using PBKDF2
+                derivedKey = await this.deriveKey(password, iterations);
+                if (progressCallback) progressCallback(60);
+                
+                // Convert derived key to hex string for salt
+                const keyHex = Array.from(derivedKey).map(b => b.toString(16).padStart(2, '0')).join('');
+                
+                // Initialize tables
+                this.initializeTables();
+                if (progressCallback) progressCallback(70, 'Generating homophone table...');
+                
+                // Create all possible homophones (00001 to 99999)
+                const allHomophones = Array.from(
+                    {length: TOTAL_HOMOPHONES}, 
+                    (_, i) => (i + 1).toString().padStart(HOMOPHONE_LENGTH, '0')
+                );
+                
+                // Deterministic shuffle based on derived key
+                const shuffledHomophones = await this.deterministicShuffle(allHomophones, derivedKey, keyHex);
+                if (progressCallback) progressCallback(90);
+                
+                // Distribute homophones evenly among letters
+                const homophonesPerLetter = Math.floor(TOTAL_HOMOPHONES / ALPHABET_SIZE);
+                let homophoneIndex = 0;
+                
+                for (const letter of ALPHABET) {
+                    // Assign homophones to this letter
+                    homophoneTable[letter] = shuffledHomophones.slice(
+                        homophoneIndex, 
+                        homophoneIndex + homophonesPerLetter
+                    );
+                    
+                    // Create reverse mapping
+                    for (const homophone of homophoneTable[letter]) {
+                        reverseHomophoneTable[homophone] = letter;
+                    }
+                    
+                    homophoneIndex += homophonesPerLetter;
                 }
-            }
-            
-            document.getElementById('key-progress').style.width = '100%';
-            return true;
-        }
-
-        // Affine transformation for additional security
-        function affineTransform(charIndex, position, prevCipherNum) {
-            if (!config.affineMode) return charIndex;
-            
-            const a = config.affineA;
-            const b = config.affineB;
-            
-            // Validate that 'a' is coprime with ALPHABET_SIZE
-            if (gcd(a, ALPHABET_SIZE) !== 1) {
-                throw new Error(`Parameter a (${a}) must be coprime with ${ALPHABET_SIZE}`);
-            }
-            
-            let result = (a * charIndex + b) % ALPHABET_SIZE;
-            
-            // Apply CBC mode if enabled
-            if (config.cbcMode) {
-                result = (result + prevCipherNum + position) % ALPHABET_SIZE;
-            }
-            
-            return result;
-        }
-
-        // Inverse affine transformation for decryption
-        function inverseAffineTransform(cipherNum, position, prevCipherNum) {
-            if (!config.affineMode) return cipherNum;
-            
-            let result = cipherNum;
-            
-            // Reverse CBC mode if enabled
-            if (config.cbcMode) {
-                result = (result - prevCipherNum - position) % ALPHABET_SIZE;
-                if (result < 0) result += ALPHABET_SIZE;
-            }
-            
-            const a = config.affineA;
-            const b = config.affineB;
-            
-            // Find modular inverse of a
-            let aInv = 0;
-            for (let i = 0; i < ALPHABET_SIZE; i++) {
-                if ((a * i) % ALPHABET_SIZE === 1) {
-                    aInv = i;
-                    break;
+                
+                // Distribute remaining homophones (if any)
+                const remainingHomophones = TOTAL_HOMOPHONES % ALPHABET_SIZE;
+                if (remainingHomophones > 0) {
+                    const extraHomophones = shuffledHomophones.slice(-remainingHomophones);
+                    
+                    // Distribute extra homophones evenly
+                    for (let i = 0; i < remainingHomophones; i++) {
+                        const letter = ALPHABET[i % ALPHABET_SIZE];
+                        homophoneTable[letter].push(extraHomophones[i]);
+                        reverseHomophoneTable[extraHomophones[i]] = letter;
+                    }
                 }
+                
+                if (progressCallback) progressCallback(100);
+                return true;
             }
             
-            result = (aInv * (result - b)) % ALPHABET_SIZE;
-            return result < 0 ? result + ALPHABET_SIZE : result;
-        }
-
-        // Helper function to calculate greatest common divisor
-        function gcd(a, b) {
-            if (b === 0) return a;
-            return gcd(b, a % b);
-        }
-
-        // Get a random homophone for a character (true randomness for non-deterministic encryption)
-        function getRandomHomophone(char) {
-            const homophones = homophoneTable[char];
-            if (!homophones || homophones.length === 0) {
-                throw new Error(`No homophones available for character: ${char}`);
+            // Affine transformation for additional security
+            affineTransform(charIndex, position, prevCipherNum) {
+                if (!config.affineMode) return charIndex;
+                
+                const a = config.affineA;
+                const b = config.affineB;
+                
+                // Validate that 'a' is coprime with ALPHABET_SIZE
+                if (!utils.validateAffineParam(a)) {
+                    throw new Error(`Parameter a (${a}) must be coprime with ${ALPHABET_SIZE}`);
+                }
+                
+                let result = (a * charIndex + b) % ALPHABET_SIZE;
+                
+                // Apply CBC mode if enabled
+                if (config.cbcMode) {
+                    result = (result + prevCipherNum + position) % ALPHABET_SIZE;
+                }
+                
+                return result;
             }
             
-            // Use cryptographically secure random number generator
-            const randomArray = new Uint32Array(1);
-            crypto.getRandomValues(randomArray);
-            const randomIndex = randomArray[0] % homophones.length;
-            
-            return homophones[randomIndex];
-        }
-
-        // Encrypt text using homophonic cipher with non-deterministic homophone selection
-        async function encryptText() {
-            const password = document.getElementById('crypto-key').value;
-            const iterations = parseInt(document.getElementById('key-iterations').value);
-            const plaintext = document.getElementById('plaintext').value.toUpperCase().replace(/[^A-Z\s]/g, '');
-            const resultElement = document.getElementById('encryption-result');
-            
-            if (!password) {
-                resultElement.innerHTML = '<span style="color: var(--error)">Enter password</span>';
-                return;
+            // Inverse affine transformation for decryption
+            inverseAffineTransform(cipherNum, position, prevCipherNum) {
+                if (!config.affineMode) return cipherNum;
+                
+                let result = cipherNum;
+                
+                // Reverse CBC mode if enabled
+                if (config.cbcMode) {
+                    result = (result - prevCipherNum - position) % ALPHABET_SIZE;
+                    if (result < 0) result += ALPHABET_SIZE;
+                }
+                
+                const a = config.affineA;
+                const b = config.affineB;
+                
+                // Find modular inverse of a
+                const aInv = utils.modInverse(a, ALPHABET_SIZE);
+                
+                result = (aInv * (result - b)) % ALPHABET_SIZE;
+                return result < 0 ? result + ALPHABET_SIZE : result;
             }
             
-            if (!plaintext) {
-                resultElement.innerHTML = '<span style="color: var(--error)">Enter plaintext to encrypt</span>';
-                return;
+            // Get a random homophone for a character (true randomness for non-deterministic encryption)
+            getRandomHomophone(char) {
+                const homophones = homophoneTable[char];
+                if (!homophones || homophones.length === 0) {
+                    throw new Error(`No homophones available for character: ${char}`);
+                }
+                
+                // Use cryptographically secure random number generator
+                const randomArray = new Uint32Array(1);
+                crypto.getRandomValues(randomArray);
+                const randomIndex = randomArray[0] % homophones.length;
+                
+                return homophones[randomIndex];
             }
             
-            try {
+            // Encrypt text using homophonic cipher with non-deterministic homophone selection
+            async encrypt(plaintext) {
+                const password = elements.cryptoKey.value;
+                const iterations = parseInt(elements.keyIterations.value);
+                
+                if (!password) {
+                    throw new Error('Password is required');
+                }
+                
+                if (!plaintext) {
+                    throw new Error('Plaintext is required');
+                }
+                
                 // Generate homophone table based on password
-                await generateHomophoneTable(password, iterations);
+                await this.generateHomophoneTable(password, iterations);
                 
+                const processedText = plaintext.toUpperCase().replace(/[^A-Z\s]/g, '');
                 let ciphertext = [];
                 let prevCipherNum = 0;
                 let position = 0;
                 
                 // Process each character
-                for (let char of plaintext) {
+                for (let char of processedText) {
                     if (char === ' ') {
                         ciphertext.push(' ');
                         continue;
@@ -705,11 +929,11 @@
                         const charIndex = ALPHABET.indexOf(char);
                         
                         // Apply affine transformation
-                        const transformedIndex = affineTransform(charIndex, position, prevCipherNum);
+                        const transformedIndex = this.affineTransform(charIndex, position, prevCipherNum);
                         const transformedChar = ALPHABET[transformedIndex];
                         
                         // Get random homophone for transformed character (non-deterministic)
-                        const homophone = getRandomHomophone(transformedChar);
+                        const homophone = this.getRandomHomophone(transformedChar);
                         ciphertext.push(homophone);
                         
                         // Update state for CBC mode
@@ -721,40 +945,24 @@
                     }
                 }
                 
-                // Display result
-                const result = ciphertext.join(' ');
-                resultElement.textContent = result;
-                document.getElementById('ciphertext').value = result;
-                document.getElementById('status').textContent = 'Encryption successful';
-                document.getElementById('status').className = 'status success';
+                return ciphertext.join(' ');
+            }
+            
+            // Decrypt text using homophonic cipher
+            async decrypt(ciphertext) {
+                const password = elements.cryptoKey.value;
+                const iterations = parseInt(elements.keyIterations.value);
                 
-            } catch (error) {
-                resultElement.innerHTML = `<span style="color: var(--error)">Encryption error: ${error.message}</span>`;
-                document.getElementById('status').textContent = `Error: ${error.message}`;
-                document.getElementById('status').className = 'status error';
-            }
-        }
-
-        // Decrypt text using homophonic cipher
-        async function decryptText() {
-            const password = document.getElementById('crypto-key').value;
-            const iterations = parseInt(document.getElementById('key-iterations').value);
-            const ciphertext = document.getElementById('ciphertext').value;
-            const resultElement = document.getElementById('decryption-result');
-            
-            if (!password) {
-                resultElement.innerHTML = '<span style="color: var(--error)">Enter password</span>';
-                return;
-            }
-            
-            if (!ciphertext) {
-                resultElement.innerHTML = '<span style="color: var(--error)">Enter ciphertext to decrypt</span>';
-                return;
-            }
-            
-            try {
+                if (!password) {
+                    throw new Error('Password is required');
+                }
+                
+                if (!ciphertext) {
+                    throw new Error('Ciphertext is required');
+                }
+                
                 // Generate homophone table based on password
-                await generateHomophoneTable(password, iterations);
+                await this.generateHomophoneTable(password, iterations);
                 
                 let plaintext = [];
                 const parts = ciphertext.split(/\s+/);
@@ -774,7 +982,7 @@
                             const cipherNum = ALPHABET.indexOf(cipherChar);
                             
                             // Apply inverse affine transformation
-                            const originalNum = inverseAffineTransform(cipherNum, position, prevCipherNum);
+                            const originalNum = this.inverseAffineTransform(cipherNum, position, prevCipherNum);
                             const originalChar = ALPHABET[originalNum];
                             
                             plaintext.push(originalChar);
@@ -794,83 +1002,198 @@
                     }
                 }
                 
-                // Display result
-                resultElement.textContent = plaintext.join('');
-                document.getElementById('status').textContent = 'Decryption successful';
-                document.getElementById('status').className = 'status success';
+                return plaintext.join('');
+            }
+        }
+
+        // Application Controller
+        const appController = {
+            cipher: new HomophoneCipher(),
+            
+            init: function() {
+                this.setupEventListeners();
+                this.updateConfig();
+                this.updateCharCounters();
+                utils.showNotification('NeonHomophone Cipher initialized', 'success');
+            },
+            
+            setupEventListeners: function() {
+                // Encryption/Decryption buttons
+                elements.encryptBtn.addEventListener('click', () => this.handleEncryption());
+                elements.decryptBtn.addEventListener('click', () => this.handleDecryption());
                 
-            } catch (error) {
-                resultElement.innerHTML = `<span style="color: var(--error)">Decryption error: ${error.message}</span>`;
-                document.getElementById('status').textContent = `Error: ${error.message}`;
-                document.getElementById('status').className = 'status error';
-            }
-        }
-
-        // Update configuration from UI
-        function updateConfig() {
-            config.cbcMode = document.getElementById('cbc-mode').checked;
-            config.affineMode = document.getElementById('affine-mode').checked;
-            config.affineA = parseInt(document.getElementById('affine-a').value);
-            config.affineB = parseInt(document.getElementById('affine-b').value);
-            
-            // Validate affine parameter a
-            if (config.affineMode && gcd(config.affineA, ALPHABET_SIZE) !== 1) {
-                document.getElementById('status').textContent = 
-                    `Warning: Parameter a (${config.affineA}) should be coprime with ${ALPHABET_SIZE}`;
-                document.getElementById('status').className = 'status error';
-            }
-        }
-
-        // Initialize application
-        function initApp() {
-            initializeTables();
-            
-            // Set up event listeners
-            document.getElementById('encrypt-btn').addEventListener('click', encryptText);
-            document.getElementById('decrypt-btn').addEventListener('click', decryptText);
-            
-            document.getElementById('generate-btn').addEventListener('click', async () => {
-                const password = document.getElementById('crypto-key').value;
-                const iterations = parseInt(document.getElementById('key-iterations').value);
-                if (password) {
-                    try {
-                        await generateHomophoneTable(password, iterations);
-                        document.getElementById('status').textContent = 'Homophone table generated successfully';
-                        document.getElementById('status').className = 'status success';
-                    } catch (error) {
-                        document.getElementById('status').textContent = `Error: ${error.message}`;
-                        document.getElementById('status').className = 'status error';
+                // Generate table button
+                elements.generateBtn.addEventListener('click', () => this.handleGenerateTable());
+                
+                // Config change listeners
+                elements.cbcMode.addEventListener('change', () => this.updateConfig());
+                elements.affineMode.addEventListener('change', () => this.updateConfig());
+                elements.affineA.addEventListener('change', () => this.updateConfig());
+                elements.affineB.addEventListener('change', () => this.updateConfig());
+                
+                // Auto-generate table when key changes
+                elements.cryptoKey.addEventListener('input', () => {
+                    this.updateCharCounters();
+                    if (elements.cryptoKey.value) {
+                        this.handleGenerateTable();
                     }
+                });
+                
+                // Character counters
+                elements.plaintext.addEventListener('input', () => this.updateCharCounters());
+                elements.ciphertext.addEventListener('input', () => this.updateCharCounters());
+                
+                // Update security level based on iterations
+                elements.keyIterations.addEventListener('input', () => {
+                    const iterations = parseInt(elements.keyIterations.value);
+                    let securityLevel = '128-bit';
+                    
+                    if (iterations >= 300000) securityLevel = '192-bit';
+                    if (iterations >= 600000) securityLevel = '256-bit';
+                    if (iterations >= 900000) securityLevel = '320-bit';
+                    
+                    elements.securityLevel.textContent = securityLevel;
+                });
+            },
+            
+            updateConfig: function() {
+                config.cbcMode = elements.cbcMode.checked;
+                config.affineMode = elements.affineMode.checked;
+                config.affineA = parseInt(elements.affineA.value);
+                config.affineB = parseInt(elements.affineB.value);
+                
+                // Validate affine parameter a
+                if (config.affineMode && !utils.validateAffineParam(config.affineA)) {
+                    elements.status.textContent = 
+                        `Warning: Parameter a (${config.affineA}) should be coprime with ${ALPHABET_SIZE}`;
+                    elements.status.className = 'status error';
                 }
-            });
+            },
             
-            // Config change listeners
-            document.getElementById('cbc-mode').addEventListener('change', updateConfig);
-            document.getElementById('affine-mode').addEventListener('change', updateConfig);
-            document.getElementById('affine-a').addEventListener('change', updateConfig);
-            document.getElementById('affine-b').addEventListener('change', updateConfig);
-            
-            // Auto-generate table when key changes
-            document.getElementById('crypto-key').addEventListener('change', async function() {
-                if (this.value) {
-                    const iterations = parseInt(document.getElementById('key-iterations').value);
-                    try {
-                        await generateHomophoneTable(this.value, iterations);
-                        document.getElementById('status').textContent = 'Homophone table updated';
-                        document.getElementById('status').className = 'status success';
-                    } catch (error) {
-                        document.getElementById('status').textContent = `Error: ${error.message}`;
-                        document.getElementById('status').className = 'status error';
-                    }
+            updateCharCounters: function() {
+                utils.updateCharCounter(elements.cryptoKey, 'keyLength');
+                utils.updateCharCounter(elements.plaintext, 'plaintextLength');
+                
+                const ciphertextValue = elements.ciphertext.value;
+                const homophoneCount = ciphertextValue ? ciphertextValue.trim().split(/\s+/).length : 0;
+                elements.ciphertextInputLength.textContent = homophoneCount;
+                
+                // Update result counters
+                const encryptionResult = elements.encryptionResult.textContent;
+                if (encryptionResult) {
+                    elements.ciphertextLength.textContent = encryptionResult ? encryptionResult.trim().split(/\s+/).length : 0;
                 }
-            });
+                
+                const decryptionResult = elements.decryptionResult.textContent;
+                if (decryptionResult) {
+                    elements.decryptedLength.textContent = decryptionResult.length;
+                }
+            },
             
-            // Initial config update
-            updateConfig();
-        }
+            handleGenerateTable: async function() {
+                const password = elements.cryptoKey.value;
+                const iterations = parseInt(elements.keyIterations.value);
+                
+                if (!password) {
+                    elements.status.textContent = 'Error: Password is required';
+                    elements.status.className = 'status error';
+                    return;
+                }
+                
+                try {
+                    utils.setLoading('generate', true);
+                    
+                    await this.cipher.generateHomophoneTable(
+                        password, 
+                        iterations,
+                        (progress, message) => {
+                            elements.keyProgress.style.width = `${progress}%`;
+                            if (message) {
+                                elements.status.textContent = message;
+                                elements.status.className = 'status success';
+                            }
+                        }
+                    );
+                    
+                    elements.status.textContent = 'Homophone table generated successfully';
+                    elements.status.className = 'status success';
+                    utils.showNotification('Homophone table generated', 'success');
+                    
+                } catch (error) {
+                    elements.status.textContent = `Error: ${error.message}`;
+                    elements.status.className = 'status error';
+                    utils.showNotification(`Error: ${error.message}`, 'error');
+                } finally {
+                    utils.setLoading('generate', false);
+                }
+            },
+            
+            handleEncryption: async function() {
+                const plaintext = elements.plaintext.value;
+                
+                if (!plaintext) {
+                    elements.encryptionResult.innerHTML = '<span style="color: var(--error)">Enter plaintext to encrypt</span>';
+                    return;
+                }
+                
+                try {
+                    utils.setLoading('encrypt', true);
+                    elements.status.textContent = 'Encrypting...';
+                    
+                    const ciphertext = await this.cipher.encrypt(plaintext);
+                    
+                    elements.encryptionResult.textContent = ciphertext;
+                    elements.ciphertext.value = ciphertext;
+                    elements.status.textContent = 'Encryption successful';
+                    elements.status.className = 'status success';
+                    
+                    this.updateCharCounters();
+                    utils.showNotification('Text encrypted successfully', 'success');
+                    
+                } catch (error) {
+                    elements.encryptionResult.innerHTML = `<span style="color: var(--error)">Encryption error: ${error.message}</span>`;
+                    elements.status.textContent = `Error: ${error.message}`;
+                    elements.status.className = 'status error';
+                    utils.showNotification(`Encryption error: ${error.message}`, 'error');
+                } finally {
+                    utils.setLoading('encrypt', false);
+                }
+            },
+            
+            handleDecryption: async function() {
+                const ciphertext = elements.ciphertext.value;
+                
+                if (!ciphertext) {
+                    elements.decryptionResult.innerHTML = '<span style="color: var(--error)">Enter ciphertext to decrypt</span>';
+                    return;
+                }
+                
+                try {
+                    utils.setLoading('decrypt', true);
+                    elements.status.textContent = 'Decrypting...';
+                    
+                    const plaintext = await this.cipher.decrypt(ciphertext);
+                    
+                    elements.decryptionResult.textContent = plaintext;
+                    elements.status.textContent = 'Decryption successful';
+                    elements.status.className = 'status success';
+                    
+                    this.updateCharCounters();
+                    utils.showNotification('Text decrypted successfully', 'success');
+                    
+                } catch (error) {
+                    elements.decryptionResult.innerHTML = `<span style="color: var(--error)">Decryption error: ${error.message}</span>`;
+                    elements.status.textContent = `Error: ${error.message}`;
+                    elements.status.className = 'status error';
+                    utils.showNotification(`Decryption error: ${error.message}`, 'error');
+                } finally {
+                    utils.setLoading('decrypt', false);
+                }
+            }
+        };
 
         // Start the application when the page loads
-        window.addEventListener('load', initApp);
+        window.addEventListener('load', () => appController.init());
     </script>
 </body>
 </html>
