@@ -181,13 +181,28 @@
             color: var(--text-dim);
             line-height: 1.5;
         }
+        
+        .progress {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--highlight), var(--success));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
             <h1>MILITARY-GRADE HOMOPHONIC CIPHER</h1>
-            <p style="color: var(--text-dim)">Cryptographically secure homophonic substitution with key-dependent distribution</p>
+            <p style="color: var(--text-dim)">PBKDF2 key derivation with non-deterministic encryption</p>
         </header>
 
         <div class="config-grid">
@@ -219,16 +234,25 @@
                 <h2>Cryptographic Key</h2>
                 
                 <div class="input-group">
-                    <label for="crypto-key">Master Key</label>
-                    <input type="text" id="crypto-key" value="MILITARY_GRADE_KEY_2024">
+                    <label for="crypto-key">Password</label>
+                    <input type="password" id="crypto-key" value="MILITARY_GRADE_KEY_2024">
+                </div>
+                
+                <div class="input-group">
+                    <label for="key-iterations">PBKDF2 Iterations</label>
+                    <input type="number" id="key-iterations" min="100000" max="1000000" value="600000">
                 </div>
 
                 <button id="generate-btn">Generate Homophone Table</button>
                 
+                <div class="progress">
+                    <div class="progress-bar" id="key-progress"></div>
+                </div>
+                
                 <div id="status" class="status success">Ready</div>
 
                 <div class="stats" id="table-stats">
-                    Key derivation: HMAC-SHA512<br>
+                    Key derivation: PBKDF2-SHA512<br>
                     Homophones: 99,999<br>
                     Security: 256-bit entropy
                 </div>
@@ -276,10 +300,12 @@
         const ALPHABET_SIZE = 26;
         const TOTAL_HOMOPHONES = 99999;
         const HOMOPHONE_LENGTH = 5;
+        const SALT = new Uint8Array([104, 111, 109, 111, 112, 104, 111, 110, 101, 95, 115, 97, 108, 116, 95, 50]); // "homophone_salt_2"
 
         // Global state
         let homophoneTable = {};
         let reverseHomophoneTable = {};
+        let derivedKey = null;
         let config = {
             cbcMode: true,
             affineMode: true,
@@ -298,12 +324,41 @@
             }
         }
 
+        // Derive key using PBKDF2 with SHA-512
+        async function deriveKey(password, iterations) {
+            const encoder = new TextEncoder();
+            const passwordBuffer = encoder.encode(password);
+            
+            // Import the password as a key
+            const keyMaterial = await crypto.subtle.importKey(
+                'raw',
+                passwordBuffer,
+                'PBKDF2',
+                false,
+                ['deriveBits']
+            );
+            
+            // Derive key using PBKDF2
+            const derivedBits = await crypto.subtle.deriveBits(
+                {
+                    name: 'PBKDF2',
+                    salt: SALT,
+                    iterations: iterations,
+                    hash: 'SHA-512'
+                },
+                keyMaterial,
+                512 // 512 bits
+            );
+            
+            return new Uint8Array(derivedBits);
+        }
+
         // Generate cryptographically secure random values using HMAC-based DRBG
         async function generateHMAC(key, data) {
             const encoder = new TextEncoder();
             const cryptoKey = await crypto.subtle.importKey(
                 'raw',
-                encoder.encode(key),
+                key,
                 { name: 'HMAC', hash: 'SHA-512' },
                 false,
                 ['sign']
@@ -334,18 +389,26 @@
             return result;
         }
 
-        // Generate homophone table based on key
-        async function generateHomophoneTable(key) {
-            if (!key || key.length === 0) {
-                throw new Error('Cryptographic key is required');
+        // Generate homophone table based on derived key
+        async function generateHomophoneTable(password, iterations) {
+            if (!password || password.length === 0) {
+                throw new Error('Password is required');
             }
+            
+            // Show progress
+            document.getElementById('key-progress').style.width = '30%';
+            document.getElementById('status').textContent = 'Deriving key with PBKDF2...';
+            
+            // Derive key using PBKDF2
+            derivedKey = await deriveKey(password, iterations);
+            document.getElementById('key-progress').style.width = '60%';
+            
+            // Convert derived key to hex string for salt
+            const keyHex = Array.from(derivedKey).map(b => b.toString(16).padStart(2, '0')).join('');
             
             // Initialize tables
             initializeTables();
-            
-            // Create salt from key to ensure different outputs for similar keys
-            const salt = await generateHMAC(key, "homophonic_salt");
-            const saltHex = Array.from(salt).map(b => b.toString(16).padStart(2, '0')).join('');
+            document.getElementById('status').textContent = 'Generating homophone table...';
             
             // Create all possible homophones (00001 to 99999)
             const allHomophones = Array.from(
@@ -353,8 +416,9 @@
                 (_, i) => (i + 1).toString().padStart(HOMOPHONE_LENGTH, '0')
             );
             
-            // Deterministic shuffle based on key
-            const shuffledHomophones = await deterministicShuffle(allHomophones, key, saltHex);
+            // Deterministic shuffle based on derived key
+            const shuffledHomophones = await deterministicShuffle(allHomophones, derivedKey, keyHex);
+            document.getElementById('key-progress').style.width = '90%';
             
             // Distribute homophones evenly among letters
             const homophonesPerLetter = Math.floor(TOTAL_HOMOPHONES / ALPHABET_SIZE);
@@ -388,6 +452,7 @@
                 }
             }
             
+            document.getElementById('key-progress').style.width = '100%';
             return true;
         }
 
@@ -447,28 +512,30 @@
             return gcd(b, a % b);
         }
 
-        // Get a random homophone for a character (cryptographically secure)
-        async function getRandomHomophone(char, key, position) {
+        // Get a random homophone for a character (true randomness for non-deterministic encryption)
+        function getRandomHomophone(char) {
             const homophones = homophoneTable[char];
             if (!homophones || homophones.length === 0) {
                 throw new Error(`No homophones available for character: ${char}`);
             }
             
-            // Use HMAC to generate a deterministic but random-looking index
-            const hmacBytes = await generateHMAC(key, `homophone_${char}_${position}`);
-            const randomIndex = new DataView(hmacBytes.buffer).getUint32(0) % homophones.length;
+            // Use cryptographically secure random number generator
+            const randomArray = new Uint32Array(1);
+            crypto.getRandomValues(randomArray);
+            const randomIndex = randomArray[0] % homophones.length;
             
             return homophones[randomIndex];
         }
 
-        // Encrypt text using homophonic cipher
+        // Encrypt text using homophonic cipher with non-deterministic homophone selection
         async function encryptText() {
-            const key = document.getElementById('crypto-key').value;
+            const password = document.getElementById('crypto-key').value;
+            const iterations = parseInt(document.getElementById('key-iterations').value);
             const plaintext = document.getElementById('plaintext').value.toUpperCase().replace(/[^A-Z\s]/g, '');
-            const resultElement = document.getElementById('encryption-result');
+            const resultElement = document.getElementById('encryption-result'];
             
-            if (!key) {
-                resultElement.innerHTML = '<span style="color: var(--error)">Enter cryptographic key</span>';
+            if (!password) {
+                resultElement.innerHTML = '<span style="color: var(--error)">Enter password</span>';
                 return;
             }
             
@@ -478,8 +545,8 @@
             }
             
             try {
-                // Generate homophone table based on key
-                await generateHomophoneTable(key);
+                // Generate homophone table based on password
+                await generateHomophoneTable(password, iterations);
                 
                 let ciphertext = [];
                 let prevCipherNum = 0;
@@ -500,8 +567,8 @@
                         const transformedIndex = affineTransform(charIndex, position, prevCipherNum);
                         const transformedChar = ALPHABET[transformedIndex];
                         
-                        // Get random homophone for transformed character
-                        const homophone = await getRandomHomophone(transformedChar, key, position);
+                        // Get random homophone for transformed character (non-deterministic)
+                        const homophone = getRandomHomophone(transformedChar);
                         ciphertext.push(homophone);
                         
                         // Update state for CBC mode
@@ -529,12 +596,13 @@
 
         // Decrypt text using homophonic cipher
         async function decryptText() {
-            const key = document.getElementById('crypto-key').value;
+            const password = document.getElementById('crypto-key').value;
+            const iterations = parseInt(document.getElementById('key-iterations').value);
             const ciphertext = document.getElementById('ciphertext').value;
-            const resultElement = document.getElementById('decryption-result');
+            const resultElement = document.getElementById('decryption-result'];
             
-            if (!key) {
-                resultElement.innerHTML = '<span style="color: var(--error)">Enter cryptographic key</span>';
+            if (!password) {
+                resultElement.innerHTML = '<span style="color: var(--error)">Enter password</span>';
                 return;
             }
             
@@ -544,8 +612,8 @@
             }
             
             try {
-                // Generate homophone table based on key
-                await generateHomophoneTable(key);
+                // Generate homophone table based on password
+                await generateHomophoneTable(password, iterations);
                 
                 let plaintext = [];
                 const parts = ciphertext.split(/\s+/);
@@ -621,10 +689,11 @@
             document.getElementById('decrypt-btn').addEventListener('click', decryptText);
             
             document.getElementById('generate-btn').addEventListener('click', async () => {
-                const key = document.getElementById('crypto-key').value;
-                if (key) {
+                const password = document.getElementById('crypto-key').value;
+                const iterations = parseInt(document.getElementById('key-iterations').value);
+                if (password) {
                     try {
-                        await generateHomophoneTable(key);
+                        await generateHomophoneTable(password, iterations);
                         document.getElementById('status').textContent = 'Homophone table generated successfully';
                         document.getElementById('status').className = 'status success';
                     } catch (error) {
@@ -643,8 +712,9 @@
             // Auto-generate table when key changes
             document.getElementById('crypto-key').addEventListener('change', async function() {
                 if (this.value) {
+                    const iterations = parseInt(document.getElementById('key-iterations').value);
                     try {
-                        await generateHomophoneTable(this.value);
+                        await generateHomophoneTable(this.value, iterations);
                         document.getElementById('status').textContent = 'Homophone table updated';
                         document.getElementById('status').className = 'status success';
                     } catch (error) {
