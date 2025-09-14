@@ -501,7 +501,7 @@
                 
                 <div class="input-group">
                     <label for="crypto-key">Password</label>
-                    <input type="password" id="crypto-key" placeholder="Enter secure password">
+                    <input type="password" id="crypto-key" value="MILITARY_GRADE_KEY_2024">
                     <div class="char-counter"><span id="key-length">0</span> characters</div>
                 </div>
                 
@@ -599,7 +599,7 @@
         const ALPHABET_SIZE = 26;
         const TOTAL_HOMOPHONES = 99999;
         const HOMOPHONE_LENGTH = 5;
-        const HMAC_BATCH_SIZE = 16; // Process 16 values per HMAC call
+        const SALT = new Uint8Array([104, 111, 109, 111, 112, 104, 111, 110, 101, 95, 115, 97, 108, 116, 95, 50]); // "homophone_salt_2"
 
         // Global state
         let homophoneTable = {};
@@ -688,11 +688,6 @@
                     if ((a * x) % m === 1) return x;
                 }
                 return 1;
-            },
-            
-            // Convert bytes to hex
-            bytesToHex: (bytes) => {
-                return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
             }
         };
 
@@ -706,6 +701,7 @@
                 homophoneTable = {};
                 reverseHomophoneTable = {};
                 
+                // Initialize empty arrays for each letter
                 for (let char of ALPHABET) {
                     homophoneTable[char] = [];
                 }
@@ -716,9 +712,7 @@
                 const encoder = new TextEncoder();
                 const passwordBuffer = encoder.encode(password);
                 
-                // Generate random salt for each session
-                const salt = crypto.getRandomValues(new Uint8Array(16));
-                
+                // Import the password as a key
                 const keyMaterial = await crypto.subtle.importKey(
                     'raw',
                     passwordBuffer,
@@ -727,24 +721,22 @@
                     ['deriveBits']
                 );
                 
+                // Derive key using PBKDF2
                 const derivedBits = await crypto.subtle.deriveBits(
                     {
                         name: 'PBKDF2',
-                        salt: salt,
+                        salt: SALT,
                         iterations: iterations,
                         hash: 'SHA-512'
                     },
                     keyMaterial,
-                    512
+                    512 // 512 bits
                 );
                 
-                return {
-                    key: new Uint8Array(derivedBits),
-                    salt: salt
-                };
+                return new Uint8Array(derivedBits);
             }
             
-            // Generate HMAC with full output utilization
+            // Generate cryptographically secure random values using HMAC-based DRBG
             async generateHMAC(key, data) {
                 const encoder = new TextEncoder();
                 const cryptoKey = await crypto.subtle.importKey(
@@ -758,33 +750,22 @@
                 return new Uint8Array(signature);
             }
             
-            // Optimized HMAC-based shuffling using full 64-byte output
+            // HMAC-based deterministic shuffling algorithm
             async deterministicShuffle(array, key, salt) {
                 const result = [...array];
                 const n = result.length;
-                const hmacCache = new Map();
                 
+                // Use HMAC in counter mode for deterministic randomness
                 for (let i = n - 1; i > 0; i--) {
-                    const batchIndex = Math.floor(i / HMAC_BATCH_SIZE);
+                    // Generate random index using HMAC
+                    const counter = i.toString();
+                    const hmacBytes = await this.generateHMAC(key, salt + counter);
                     
-                    if (!hmacCache.has(batchIndex)) {
-                        const hmacBytes = await this.generateHMAC(key, salt + batchIndex);
-                        hmacCache.set(batchIndex, hmacBytes);
-                    }
-                    
-                    const hmacBytes = hmacCache.get(batchIndex);
-                    const valuesInBatch = Math.min(HMAC_BATCH_SIZE, i + 1);
-                    const valuesPerByte = Math.floor(64 / valuesInBatch);
-                    
-                    const positionInBatch = i % HMAC_BATCH_SIZE;
-                    const byteOffset = positionInBatch * valuesPerByte;
-                    
-                    let randomValue = 0;
-                    for (let j = 0; j < valuesPerByte; j++) {
-                        randomValue = (randomValue << 8) | hmacBytes[byteOffset + j];
-                    }
-                    
+                    // Convert to integer in range [0, i]
+                    const randomValue = new DataView(hmacBytes.buffer).getUint32(0);
                     const j = randomValue % (i + 1);
+                    
+                    // Swap elements
                     [result[i], result[j]] = [result[j], result[i]];
                 }
                 
@@ -799,31 +780,39 @@
                 
                 if (progressCallback) progressCallback(30, 'Deriving key with PBKDF2...');
                 
-                const keyData = await this.deriveKey(password, iterations);
-                derivedKey = keyData.key;
+                // Derive key using PBKDF2
+                derivedKey = await this.deriveKey(password, iterations);
                 if (progressCallback) progressCallback(60);
                 
-                const keyHex = utils.bytesToHex(derivedKey);
+                // Convert derived key to hex string for salt
+                const keyHex = Array.from(derivedKey).map(b => b.toString(16).padStart(2, '0')).join('');
+                
+                // Initialize tables
                 this.initializeTables();
                 if (progressCallback) progressCallback(70, 'Generating homophone table...');
                 
+                // Create all possible homophones (00001 to 99999)
                 const allHomophones = Array.from(
                     {length: TOTAL_HOMOPHONES}, 
                     (_, i) => (i + 1).toString().padStart(HOMOPHONE_LENGTH, '0')
                 );
                 
+                // Deterministic shuffle based on derived key
                 const shuffledHomophones = await this.deterministicShuffle(allHomophones, derivedKey, keyHex);
                 if (progressCallback) progressCallback(90);
                 
+                // Distribute homophones evenly among letters
                 const homophonesPerLetter = Math.floor(TOTAL_HOMOPHONES / ALPHABET_SIZE);
                 let homophoneIndex = 0;
                 
                 for (const letter of ALPHABET) {
+                    // Assign homophones to this letter
                     homophoneTable[letter] = shuffledHomophones.slice(
                         homophoneIndex, 
                         homophoneIndex + homophonesPerLetter
                     );
                     
+                    // Create reverse mapping
                     for (const homophone of homophoneTable[letter]) {
                         reverseHomophoneTable[homophone] = letter;
                     }
@@ -831,10 +820,12 @@
                     homophoneIndex += homophonesPerLetter;
                 }
                 
+                // Distribute remaining homophones (if any)
                 const remainingHomophones = TOTAL_HOMOPHONES % ALPHABET_SIZE;
                 if (remainingHomophones > 0) {
                     const extraHomophones = shuffledHomophones.slice(-remainingHomophones);
                     
+                    // Distribute extra homophones evenly
                     for (let i = 0; i < remainingHomophones; i++) {
                         const letter = ALPHABET[i % ALPHABET_SIZE];
                         homophoneTable[letter].push(extraHomophones[i]);
@@ -853,12 +844,14 @@
                 const a = config.affineA;
                 const b = config.affineB;
                 
+                // Validate that 'a' is coprime with ALPHABET_SIZE
                 if (!utils.validateAffineParam(a)) {
                     throw new Error(`Parameter a (${a}) must be coprime with ${ALPHABET_SIZE}`);
                 }
                 
                 let result = (a * charIndex + b) % ALPHABET_SIZE;
                 
+                // Apply CBC mode if enabled
                 if (config.cbcMode) {
                     result = (result + prevCipherNum + position) % ALPHABET_SIZE;
                 }
@@ -872,6 +865,7 @@
                 
                 let result = cipherNum;
                 
+                // Reverse CBC mode if enabled
                 if (config.cbcMode) {
                     result = (result - prevCipherNum - position) % ALPHABET_SIZE;
                     if (result < 0) result += ALPHABET_SIZE;
@@ -879,19 +873,22 @@
                 
                 const a = config.affineA;
                 const b = config.affineB;
+                
+                // Find modular inverse of a
                 const aInv = utils.modInverse(a, ALPHABET_SIZE);
                 
                 result = (aInv * (result - b)) % ALPHABET_SIZE;
                 return result < 0 ? result + ALPHABET_SIZE : result;
             }
             
-            // Get a random homophone for a character
+            // Get a random homophone for a character (true randomness for non-deterministic encryption)
             getRandomHomophone(char) {
                 const homophones = homophoneTable[char];
                 if (!homophones || homophones.length === 0) {
                     throw new Error(`No homophones available for character: ${char}`);
                 }
                 
+                // Use cryptographically secure random number generator
                 const randomArray = new Uint32Array(1);
                 crypto.getRandomValues(randomArray);
                 const randomIndex = randomArray[0] % homophones.length;
@@ -899,7 +896,7 @@
                 return homophones[randomIndex];
             }
             
-            // Encrypt text using homophonic cipher
+            // Encrypt text using homophonic cipher with non-deterministic homophone selection
             async encrypt(plaintext) {
                 const password = elements.cryptoKey.value;
                 const iterations = parseInt(elements.keyIterations.value);
@@ -912,6 +909,7 @@
                     throw new Error('Plaintext is required');
                 }
                 
+                // Generate homophone table based on password
                 await this.generateHomophoneTable(password, iterations);
                 
                 const processedText = plaintext.toUpperCase().replace(/[^A-Z\s]/g, '');
@@ -919,6 +917,7 @@
                 let prevCipherNum = 0;
                 let position = 0;
                 
+                // Process each character
                 for (let char of processedText) {
                     if (char === ' ') {
                         ciphertext.push(' ');
@@ -926,14 +925,18 @@
                     }
                     
                     if (ALPHABET.includes(char)) {
+                        // Get character index
                         const charIndex = ALPHABET.indexOf(char);
+                        
+                        // Apply affine transformation
                         const transformedIndex = this.affineTransform(charIndex, position, prevCipherNum);
                         const transformedChar = ALPHABET[transformedIndex];
                         
-                        // FIXED: Use homophone for transformed character
+                        // Get random homophone for transformed character (non-deterministic)
                         const homophone = this.getRandomHomophone(transformedChar);
                         ciphertext.push(homophone);
                         
+                        // Update state for CBC mode
                         if (config.cbcMode) {
                             prevCipherNum = transformedIndex;
                         }
@@ -958,6 +961,7 @@
                     throw new Error('Ciphertext is required');
                 }
                 
+                // Generate homophone table based on password
                 await this.generateHomophoneTable(password, iterations);
                 
                 let plaintext = [];
@@ -965,22 +969,25 @@
                 let prevCipherNum = 0;
                 let position = 0;
                 
+                // Process each part
                 for (let part of parts) {
                     if (part === '') {
                         continue;
                     }
                     
+                    // Check if this is a homophone (5-digit number)
                     if (/^\d{5}$/.test(part)) {
                         if (reverseHomophoneTable[part]) {
                             const cipherChar = reverseHomophoneTable[part];
                             const cipherNum = ALPHABET.indexOf(cipherChar);
                             
-                            // FIXED: Apply inverse transformation
+                            // Apply inverse affine transformation
                             const originalNum = this.inverseAffineTransform(cipherNum, position, prevCipherNum);
                             const originalChar = ALPHABET[originalNum];
                             
                             plaintext.push(originalChar);
                             
+                            // Update state for CBC mode
                             if (config.cbcMode) {
                                 prevCipherNum = cipherNum;
                             }
@@ -990,6 +997,7 @@
                             plaintext.push('?');
                         }
                     } else {
+                        // Preserve non-homophone parts (like spaces)
                         plaintext.push(part);
                     }
                 }
@@ -1010,15 +1018,20 @@
             },
             
             setupEventListeners: function() {
+                // Encryption/Decryption buttons
                 elements.encryptBtn.addEventListener('click', () => this.handleEncryption());
                 elements.decryptBtn.addEventListener('click', () => this.handleDecryption());
+                
+                // Generate table button
                 elements.generateBtn.addEventListener('click', () => this.handleGenerateTable());
                 
+                // Config change listeners
                 elements.cbcMode.addEventListener('change', () => this.updateConfig());
                 elements.affineMode.addEventListener('change', () => this.updateConfig());
                 elements.affineA.addEventListener('change', () => this.updateConfig());
                 elements.affineB.addEventListener('change', () => this.updateConfig());
                 
+                // Auto-generate table when key changes
                 elements.cryptoKey.addEventListener('input', () => {
                     this.updateCharCounters();
                     if (elements.cryptoKey.value) {
@@ -1026,9 +1039,11 @@
                     }
                 });
                 
+                // Character counters
                 elements.plaintext.addEventListener('input', () => this.updateCharCounters());
                 elements.ciphertext.addEventListener('input', () => this.updateCharCounters());
                 
+                // Update security level based on iterations
                 elements.keyIterations.addEventListener('input', () => {
                     const iterations = parseInt(elements.keyIterations.value);
                     let securityLevel = '128-bit';
@@ -1047,6 +1062,7 @@
                 config.affineA = parseInt(elements.affineA.value);
                 config.affineB = parseInt(elements.affineB.value);
                 
+                // Validate affine parameter a
                 if (config.affineMode && !utils.validateAffineParam(config.affineA)) {
                     elements.status.textContent = 
                         `Warning: Parameter a (${config.affineA}) should be coprime with ${ALPHABET_SIZE}`;
@@ -1062,6 +1078,7 @@
                 const homophoneCount = ciphertextValue ? ciphertextValue.trim().split(/\s+/).length : 0;
                 elements.ciphertextInputLength.textContent = homophoneCount;
                 
+                // Update result counters
                 const encryptionResult = elements.encryptionResult.textContent;
                 if (encryptionResult) {
                     elements.ciphertextLength.textContent = encryptionResult ? encryptionResult.trim().split(/\s+/).length : 0;
