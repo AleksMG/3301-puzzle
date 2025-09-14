@@ -501,7 +501,7 @@
                 
                 <div class="input-group">
                     <label for="crypto-key">Password</label>
-                    <input type="password" id="crypto-key" value="MILITARY_GRADE_KEY_2024">
+                    <input type="password" id="crypto-key" placeholder="Enter secure password">
                     <div class="char-counter"><span id="key-length">0</span> characters</div>
                 </div>
                 
@@ -599,8 +599,7 @@
         const ALPHABET_SIZE = 26;
         const TOTAL_HOMOPHONES = 99999;
         const HOMOPHONE_LENGTH = 5;
-        const SALT = new Uint8Array([104, 111, 109, 111, 112, 104, 111, 110, 101, 95, 115, 97, 108, 116, 95, 50]); // "homophone_salt_2"
-        const HMAC_BATCH_SIZE = 16;
+        const HMAC_BATCH_SIZE = 16; // Process 16 values per HMAC call
 
         // Global state
         let homophoneTable = {};
@@ -632,9 +631,11 @@
             decryptionResult: document.getElementById('decryption-result'),
             securityLevel: document.getElementById('security-level'),
             notification: document.getElementById('notification'),
+            // Loading indicators
             generateLoading: document.getElementById('generate-loading'),
             encryptLoading: document.getElementById('encrypt-loading'),
             decryptLoading: document.getElementById('decrypt-loading'),
+            // Character counters
             keyLength: document.getElementById('key-length'),
             plaintextLength: document.getElementById('plaintext-length'),
             ciphertextLength: document.getElementById('ciphertext-length'),
@@ -680,6 +681,7 @@
                 return utils.gcd(b, a % b);
             },
             
+            // Modular inverse for affine cipher
             modInverse: (a, m) => {
                 a = (a % m + m) % m;
                 for (let x = 1; x < m; x++) {
@@ -688,6 +690,7 @@
                 return 1;
             },
             
+            // Convert bytes to hex
             bytesToHex: (bytes) => {
                 return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
             }
@@ -708,9 +711,13 @@
                 }
             }
             
+            // Derive key using PBKDF2 with SHA-512
             async deriveKey(password, iterations) {
                 const encoder = new TextEncoder();
                 const passwordBuffer = encoder.encode(password);
+                
+                // Generate random salt for each session
+                const salt = crypto.getRandomValues(new Uint8Array(16));
                 
                 const keyMaterial = await crypto.subtle.importKey(
                     'raw',
@@ -723,7 +730,7 @@
                 const derivedBits = await crypto.subtle.deriveBits(
                     {
                         name: 'PBKDF2',
-                        salt: SALT,
+                        salt: salt,
                         iterations: iterations,
                         hash: 'SHA-512'
                     },
@@ -731,9 +738,13 @@
                     512
                 );
                 
-                return new Uint8Array(derivedBits);
+                return {
+                    key: new Uint8Array(derivedBits),
+                    salt: salt
+                };
             }
             
+            // Generate HMAC with full output utilization
             async generateHMAC(key, data) {
                 const encoder = new TextEncoder();
                 const cryptoKey = await crypto.subtle.importKey(
@@ -747,20 +758,17 @@
                 return new Uint8Array(signature);
             }
             
-            async deterministicShuffle(array, key) {
+            // Optimized HMAC-based shuffling using full 64-byte output
+            async deterministicShuffle(array, key, salt) {
                 const result = [...array];
                 const n = result.length;
                 const hmacCache = new Map();
-                
-                // Use first 16 bytes of derived key as fixed salt for HMAC
-                const fixedSaltBytes = key.slice(0, 16);
-                const fixedSalt = Array.from(fixedSaltBytes).map(b => b.toString(16).padStart(2, '0')).join('');
                 
                 for (let i = n - 1; i > 0; i--) {
                     const batchIndex = Math.floor(i / HMAC_BATCH_SIZE);
                     
                     if (!hmacCache.has(batchIndex)) {
-                        const hmacBytes = await this.generateHMAC(key, fixedSalt + batchIndex);
+                        const hmacBytes = await this.generateHMAC(key, salt + batchIndex);
                         hmacCache.set(batchIndex, hmacBytes);
                     }
                     
@@ -783,6 +791,7 @@
                 return result;
             }
             
+            // Generate homophone table based on derived key
             async generateHomophoneTable(password, iterations, progressCallback = null) {
                 if (!password || password.length === 0) {
                     throw new Error('Password is required');
@@ -790,9 +799,11 @@
                 
                 if (progressCallback) progressCallback(30, 'Deriving key with PBKDF2...');
                 
-                derivedKey = await this.deriveKey(password, iterations);
+                const keyData = await this.deriveKey(password, iterations);
+                derivedKey = keyData.key;
                 if (progressCallback) progressCallback(60);
                 
+                const keyHex = utils.bytesToHex(derivedKey);
                 this.initializeTables();
                 if (progressCallback) progressCallback(70, 'Generating homophone table...');
                 
@@ -801,7 +812,7 @@
                     (_, i) => (i + 1).toString().padStart(HOMOPHONE_LENGTH, '0')
                 );
                 
-                const shuffledHomophones = await this.deterministicShuffle(allHomophones, derivedKey);
+                const shuffledHomophones = await this.deterministicShuffle(allHomophones, derivedKey, keyHex);
                 if (progressCallback) progressCallback(90);
                 
                 const homophonesPerLetter = Math.floor(TOTAL_HOMOPHONES / ALPHABET_SIZE);
@@ -835,6 +846,7 @@
                 return true;
             }
             
+            // Affine transformation for additional security
             affineTransform(charIndex, position, prevCipherNum) {
                 if (!config.affineMode) return charIndex;
                 
@@ -854,6 +866,7 @@
                 return result;
             }
             
+            // Inverse affine transformation for decryption
             inverseAffineTransform(cipherNum, position, prevCipherNum) {
                 if (!config.affineMode) return cipherNum;
                 
@@ -872,6 +885,7 @@
                 return result < 0 ? result + ALPHABET_SIZE : result;
             }
             
+            // Get a random homophone for a character
             getRandomHomophone(char) {
                 const homophones = homophoneTable[char];
                 if (!homophones || homophones.length === 0) {
@@ -885,6 +899,7 @@
                 return homophones[randomIndex];
             }
             
+            // Encrypt text using homophonic cipher
             async encrypt(plaintext) {
                 const password = elements.cryptoKey.value;
                 const iterations = parseInt(elements.keyIterations.value);
@@ -915,6 +930,7 @@
                         const transformedIndex = this.affineTransform(charIndex, position, prevCipherNum);
                         const transformedChar = ALPHABET[transformedIndex];
                         
+                        // FIXED: Use homophone for transformed character
                         const homophone = this.getRandomHomophone(transformedChar);
                         ciphertext.push(homophone);
                         
@@ -929,6 +945,7 @@
                 return ciphertext.join(' ');
             }
             
+            // Decrypt text using homophonic cipher
             async decrypt(ciphertext) {
                 const password = elements.cryptoKey.value;
                 const iterations = parseInt(elements.keyIterations.value);
@@ -958,6 +975,7 @@
                             const cipherChar = reverseHomophoneTable[part];
                             const cipherNum = ALPHABET.indexOf(cipherChar);
                             
+                            // FIXED: Apply inverse transformation
                             const originalNum = this.inverseAffineTransform(cipherNum, position, prevCipherNum);
                             const originalChar = ALPHABET[originalNum];
                             
