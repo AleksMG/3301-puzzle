@@ -509,7 +509,7 @@
                     <label for="key-iterations" class="tooltip">PBKDF2 Iterations
                         <span class="tooltiptext">Higher values increase security but slow down processing</span>
                     </label>
-                    <input type="number" id="key-iterations" min="100000" max="1000000" value="100000">
+                    <input type="number" id="key-iterations" min="100000" max="1000000" value="600000">
                 </div>
 
                 <button id="generate-btn">
@@ -715,6 +715,9 @@
             async deriveKey(password, iterations) {
                 const encoder = new TextEncoder();
                 const passwordBuffer = encoder.encode(password);
+                
+                // Generate  salt for each session
+                const salt = crypto.getValues(new Uint8Array(16));
                 
                 const keyMaterial = await crypto.subtle.importKey(
                     'raw',
