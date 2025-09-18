@@ -161,6 +161,7 @@
 
         .input-group {
             margin-bottom: 20px;
+            position: relative;
         }
 
         label {
@@ -736,8 +737,23 @@
                 return new Uint8Array(derivedBits);
             }
             
-            // Generate cryptographically secure random values using HMAC-based DRBG
-            async generateHMAC(key, data) {
+            // Простой детерминированный PRNG на основе HMAC
+            createPRNG(seed) {
+                const seedArray = new Uint32Array(seed.buffer);
+                let state = seedArray[0];
+                
+                return function() {
+                    state = (state * 1664525 + 1013904223) >>> 0;
+                    return state / 4294967296; // возвращает число от 0 до 1
+                };
+            }
+            
+            // Оптимизированное детерминистическое перемешивание с ОДНИМ вызовом HMAC
+            async deterministicShuffle(array, key) {
+                const result = [...array];
+                const n = result.length;
+                
+                // ОДИН вызов HMAC для генерации seed
                 const encoder = new TextEncoder();
                 const cryptoKey = await crypto.subtle.importKey(
                     'raw',
@@ -746,26 +762,13 @@
                     false,
                     ['sign']
                 );
-                const signature = await crypto.subtle.sign('HMAC', cryptoKey, encoder.encode(data));
-                return new Uint8Array(signature);
-            }
-            
-            // HMAC-based deterministic shuffling algorithm
-            async deterministicShuffle(array, key, salt) {
-                const result = [...array];
-                const n = result.length;
                 
-                // Use HMAC in counter mode for deterministic randomness
+                const hmacResult = await crypto.subtle.sign('HMAC', cryptoKey, encoder.encode('shuffle_seed'));
+                const prng = this.createPRNG(new Uint8Array(hmacResult));
+                
+                // Алгоритм Фишера-Йейтса
                 for (let i = n - 1; i > 0; i--) {
-                    // Generate random index using HMAC
-                    const counter = i.toString();
-                    const hmacBytes = await this.generateHMAC(key, salt + counter);
-                    
-                    // Convert to integer in range [0, i]
-                    const randomValue = new DataView(hmacBytes.buffer).getUint32(0);
-                    const j = randomValue % (i + 1);
-                    
-                    // Swap elements
+                    const j = Math.floor(prng() * (i + 1));
                     [result[i], result[j]] = [result[j], result[i]];
                 }
                 
@@ -784,9 +787,6 @@
                 derivedKey = await this.deriveKey(password, iterations);
                 if (progressCallback) progressCallback(60);
                 
-                // Convert derived key to hex string for salt
-                const keyHex = Array.from(derivedKey).map(b => b.toString(16).padStart(2, '0')).join('');
-                
                 // Initialize tables
                 this.initializeTables();
                 if (progressCallback) progressCallback(70, 'Generating homophone table...');
@@ -798,7 +798,7 @@
                 );
                 
                 // Deterministic shuffle based on derived key
-                const shuffledHomophones = await this.deterministicShuffle(allHomophones, derivedKey, keyHex);
+                const shuffledHomophones = await this.deterministicShuffle(allHomophones, derivedKey);
                 if (progressCallback) progressCallback(90);
                 
                 // Distribute homophones evenly among letters
