@@ -838,7 +838,7 @@
             }
             
             // Affine transformation for additional security
-            affineTransform(charIndex, position, prevCipherNum) {
+            affineTransform(charIndex, position, prevCharIndex) {
                 if (!config.affineMode) return charIndex;
                 
                 const a = config.affineA;
@@ -851,23 +851,23 @@
                 
                 let result = (a * charIndex + b) % ALPHABET_SIZE;
                 
-                // Apply CBC mode if enabled
+                // Apply CBC mode if enabled - используем предыдущую букву и позицию
                 if (config.cbcMode) {
-                    result = (result + prevCipherNum + position) % ALPHABET_SIZE;
+                    result = (result + prevCharIndex + position) % ALPHABET_SIZE;
                 }
                 
                 return result;
             }
             
             // Inverse affine transformation for decryption
-            inverseAffineTransform(cipherNum, position, prevCipherNum) {
+            inverseAffineTransform(cipherNum, position, prevCharIndex) {
                 if (!config.affineMode) return cipherNum;
                 
                 let result = cipherNum;
                 
                 // Reverse CBC mode if enabled
                 if (config.cbcMode) {
-                    result = (result - prevCipherNum - position) % ALPHABET_SIZE;
+                    result = (result - prevCharIndex - position) % ALPHABET_SIZE;
                     if (result < 0) result += ALPHABET_SIZE;
                 }
                 
@@ -914,7 +914,7 @@
                 
                 const processedText = plaintext.toUpperCase().replace(/[^A-Z\s]/g, '');
                 let ciphertext = [];
-                let prevCipherNum = 0;
+                let prevCharIndex = 0;
                 let position = 0;
                 
                 // Process each character
@@ -928,8 +928,8 @@
                         // Get character index
                         const charIndex = ALPHABET.indexOf(char);
                         
-                        // Apply affine transformation
-                        const transformedIndex = this.affineTransform(charIndex, position, prevCipherNum);
+                        // Apply affine transformation to the character index
+                        const transformedIndex = this.affineTransform(charIndex, position, prevCharIndex);
                         const transformedChar = ALPHABET[transformedIndex];
                         
                         // Get random homophone for transformed character (non-deterministic)
@@ -938,7 +938,7 @@
                         
                         // Update state for CBC mode
                         if (config.cbcMode) {
-                            prevCipherNum = transformedIndex;
+                            prevCharIndex = transformedIndex;
                         }
                         
                         position++;
@@ -966,7 +966,7 @@
                 
                 let plaintext = [];
                 const parts = ciphertext.split(/\s+/);
-                let prevCipherNum = 0;
+                let prevCharIndex = 0;
                 let position = 0;
                 
                 // Process each part
@@ -982,14 +982,14 @@
                             const cipherNum = ALPHABET.indexOf(cipherChar);
                             
                             // Apply inverse affine transformation
-                            const originalNum = this.inverseAffineTransform(cipherNum, position, prevCipherNum);
+                            const originalNum = this.inverseAffineTransform(cipherNum, position, prevCharIndex);
                             const originalChar = ALPHABET[originalNum];
                             
                             plaintext.push(originalChar);
                             
                             // Update state for CBC mode
                             if (config.cbcMode) {
-                                prevCipherNum = cipherNum;
+                                prevCharIndex = cipherNum;
                             }
                             
                             position++;
