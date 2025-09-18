@@ -341,7 +341,7 @@
         }
 
         .terminal-header {
-            display: flex;
+            display: flexible;
             align-items: center;
             margin-bottom: 15px;
             padding-bottom: 10px;
@@ -368,7 +368,7 @@
         }
 
         .key-value {
-            display: flex;
+            display: flexible;
             justify-content: space-between;
             margin-bottom: 10px;
             padding-bottom: 10px;
@@ -837,47 +837,29 @@
                 return true;
             }
             
-            // Affine transformation for additional security
-            affineTransform(charIndex, position, prevCharIndex) {
+            // Affine transformation
+            affineTransform(charIndex) {
                 if (!config.affineMode) return charIndex;
                 
                 const a = config.affineA;
                 const b = config.affineB;
                 
-                // Validate that 'a' is coprime with ALPHABET_SIZE
                 if (!utils.validateAffineParam(a)) {
                     throw new Error(`Parameter a (${a}) must be coprime with ${ALPHABET_SIZE}`);
                 }
                 
-                let result = (a * charIndex + b) % ALPHABET_SIZE;
-                
-                // Apply CBC mode if enabled - используем предыдущую букву и позицию
-                if (config.cbcMode) {
-                    result = (result + prevCharIndex + position) % ALPHABET_SIZE;
-                }
-                
-                return result;
+                return (a * charIndex + b) % ALPHABET_SIZE;
             }
             
-            // Inverse affine transformation for decryption
-            inverseAffineTransform(cipherNum, position, prevCharIndex) {
+            // Inverse affine transformation
+            inverseAffineTransform(cipherNum) {
                 if (!config.affineMode) return cipherNum;
-                
-                let result = cipherNum;
-                
-                // Reverse CBC mode if enabled
-                if (config.cbcMode) {
-                    result = (result - prevCharIndex - position) % ALPHABET_SIZE;
-                    if (result < 0) result += ALPHABET_SIZE;
-                }
                 
                 const a = config.affineA;
                 const b = config.affineB;
-                
-                // Find modular inverse of a
                 const aInv = utils.modInverse(a, ALPHABET_SIZE);
                 
-                result = (aInv * (result - b)) % ALPHABET_SIZE;
+                let result = (aInv * (cipherNum - b)) % ALPHABET_SIZE;
                 return result < 0 ? result + ALPHABET_SIZE : result;
             }
             
@@ -914,7 +896,7 @@
                 
                 const processedText = plaintext.toUpperCase().replace(/[^A-Z\s]/g, '');
                 let ciphertext = [];
-                let prevCharIndex = 0;
+                let prevCipherChar = 'A'; // Для CBC режима - предыдущая зашифрованная буква
                 let position = 0;
                 
                 // Process each character
@@ -925,20 +907,31 @@
                     }
                     
                     if (ALPHABET.includes(char)) {
-                        // Get character index
-                        const charIndex = ALPHABET.indexOf(char);
+                        let targetChar = char; // Буква, для которой будем брать омофон
                         
-                        // Apply affine transformation to the character index
-                        const transformedIndex = this.affineTransform(charIndex, position, prevCharIndex);
-                        const transformedChar = ALPHABET[transformedIndex];
+                        // Apply CBC mode if enabled - ВЛИЯЕМ НА ПЕРЕСТАНОВКУ БУКВ
+                        if (config.cbcMode) {
+                            // Исходная буква + позиция + предыдущая зашифрованная буква = другая буква
+                            const charIndex = ALPHABET.indexOf(char);
+                            const prevCharIndex = ALPHABET.indexOf(prevCipherChar);
+                            const combinedIndex = (charIndex + position + prevCharIndex) % ALPHABET_SIZE;
+                            targetChar = ALPHABET[combinedIndex];
+                        }
                         
-                        // Get random homophone for transformed character (non-deterministic)
-                        const homophone = this.getRandomHomophone(transformedChar);
+                        // Apply affine transformation - ТОЖЕ ВЛИЯЕМ НА ПЕРЕСТАНОВКУ БУКВ
+                        if (config.affineMode) {
+                            const targetIndex = ALPHABET.indexOf(targetChar);
+                            const affineIndex = this.affineTransform(targetIndex);
+                            targetChar = ALPHABET[affineIndex];
+                        }
+                        
+                        // Get random homophone for the target character - ОМОФОН БЕРЕТСЯ ОТ УЖЕ ПРЕОБРАЗОВАННОЙ БУКВЫ
+                        const homophone = this.getRandomHomophone(targetChar);
                         ciphertext.push(homophone);
                         
-                        // Update state for CBC mode
+                        // Update state for CBC mode - сохраняем букву, ДЛЯ КОТОРОЙ БРАЛИ ОМОФОН
                         if (config.cbcMode) {
-                            prevCharIndex = transformedIndex;
+                            prevCipherChar = targetChar;
                         }
                         
                         position++;
@@ -948,7 +941,7 @@
                 return ciphertext.join(' ');
             }
             
-            // Decrypt text using homophonic cipher
+            // Decrypt text using homophonic cipher  
             async decrypt(ciphertext) {
                 const password = elements.cryptoKey.value;
                 const iterations = parseInt(elements.keyIterations.value);
@@ -966,7 +959,7 @@
                 
                 let plaintext = [];
                 const parts = ciphertext.split(/\s+/);
-                let prevCharIndex = 0;
+                let prevCipherChar = 'A'; // Для CBC режима
                 let position = 0;
                 
                 // Process each part
@@ -978,20 +971,33 @@
                     // Check if this is a homophone (5-digit number)
                     if (/^\d{5}$/.test(part)) {
                         if (reverseHomophoneTable[part]) {
-                            const cipherChar = reverseHomophoneTable[part];
-                            const cipherNum = ALPHABET.indexOf(cipherChar);
+                            // Получаем букву, ДЛЯ КОТОРОЙ БЫЛ ВЗЯТ ЭТОТ ОМОФОН
+                            const targetChar = reverseHomophoneTable[part];
+                            let originalChar = targetChar;
                             
-                            // Apply inverse affine transformation
-                            const originalNum = this.inverseAffineTransform(cipherNum, position, prevCharIndex);
-                            const originalChar = ALPHABET[originalNum];
-                            
-                            plaintext.push(originalChar);
-                            
-                            // Update state for CBC mode
-                            if (config.cbcMode) {
-                                prevCharIndex = cipherNum;
+                            // Reverse affine transformation - ОБРАТНАЯ ПЕРЕСТАНОВКА БУКВ
+                            if (config.affineMode) {
+                                const targetIndex = ALPHABET.indexOf(targetChar);
+                                const originalIndex = this.inverseAffineTransform(targetIndex);
+                                originalChar = ALPHABET[originalIndex];
                             }
                             
+                            // Reverse CBC mode - ОБРАТНАЯ ПЕРЕСТАНОВКА БУКВ
+                            if (config.cbcMode) {
+                                const originalIndex = ALPHABET.indexOf(originalChar);
+                                const prevCharIndex = ALPHABET.indexOf(prevCipherChar);
+                                
+                                // Обратное преобразование: originalChar = исходная_буква + position + prevCipherChar
+                                let sourceIndex = (originalIndex - position - prevCharIndex) % ALPHABET_SIZE;
+                                if (sourceIndex < 0) sourceIndex += ALPHABET_SIZE;
+                                
+                                originalChar = ALPHABET[sourceIndex];
+                                
+                                // Update state for next iteration
+                                prevCipherChar = targetChar; // Сохраняем букву, ДЛЯ КОТОРОЙ БЫЛ ОМОФОН
+                            }
+                            
+                            plaintext.push(originalChar);
                             position++;
                         } else {
                             plaintext.push('?');
